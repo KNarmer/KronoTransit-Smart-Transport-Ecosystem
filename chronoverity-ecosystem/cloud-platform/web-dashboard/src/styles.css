@@ -1,0 +1,151 @@
+/* ChronoVerity dashboard styling.
+   Palette chosen for a low-glare, long-shift clinical control-room
+   context (dim ambient light, sustained monitoring) rather than a
+   generic SaaS light theme: deep charcoal-navy base, a desaturated
+   teal for "healthy," warm amber/red reserved strictly for alerts. */
+
+:root {
+  --cv-bg: #0b0f13;
+  --cv-panel-bg: #10151b;
+  --cv-border: #2a3441;
+  --cv-text: #dde3ea;
+  --cv-text-dim: #7f8ea3;
+  --cv-viable: #5fb0a8;
+  --cv-warning: #d9a441;
+  --cv-breached: #d9615f;
+  --cv-font-ui: "IBM Plex Sans", -apple-system, sans-serif;
+  --cv-font-data: "IBM Plex Mono", "SFMono-Regular", monospace;
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--cv-bg);
+  color: var(--cv-text);
+  font-family: var(--cv-font-ui);
+}
+
+.cv-app {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 32px 24px 64px;
+}
+
+.cv-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-bottom: 24px;
+}
+
+.cv-header h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.cv-subtitle {
+  color: var(--cv-text-dim);
+  margin: 4px 0 0;
+  font-size: 0.9rem;
+}
+
+.cv-connection-pill {
+  font-family: var(--cv-font-data);
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--cv-border);
+}
+.cv-connection-pill.connected { color: var(--cv-viable); border-color: var(--cv-viable); }
+.cv-connection-pill.disconnected { color: var(--cv-text-dim); }
+
+.cv-summary-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.cv-summary-card {
+  background: var(--cv-panel-bg);
+  border: 1px solid var(--cv-border);
+  border-radius: 8px;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  min-width: 140px;
+}
+.cv-summary-card.emphasize { border-color: var(--cv-breached); }
+
+.cv-summary-value {
+  font-family: var(--cv-font-data);
+  font-size: 1.8rem;
+  font-weight: 600;
+}
+
+.cv-summary-label {
+  color: var(--cv-text-dim);
+  font-size: 0.8rem;
+  margin-top: 4px;
+}
+
+.cv-main-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.cv-panel-wide {
+  grid-column: 1 / -1;
+}
+
+.cv-panel {
+  background: var(--cv-panel-bg);
+  border: 1px solid var(--cv-border);
+  border-radius: 8px;
+  padding: 16px 20px;
+}
+
+.cv-panel h2 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0 0 12px;
+  color: var(--cv-text-dim);
+}
+
+.cv-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--cv-font-data);
+  font-size: 0.85rem;
+}
+
+.cv-table th {
+  text-align: left;
+  color: var(--cv-text-dim);
+  font-weight: 500;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--cv-border);
+}
+
+.cv-table td {
+  padding: 8px;
+  border-bottom: 1px solid var(--cv-border);
+}
+
+.cv-status-badge {
+  font-size: 0.72rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid currentColor;
+}
+.tone-viable { color: var(--cv-viable); }
+.tone-warning { color: var(--cv-warning); }
+.tone-breached { color: var(--cv-breached); }
+.tone-unknown { color: var(--cv-text-dim); }
+
+@media (max-width: 720px) {
+  .cv-main-grid { grid-template-columns: 1fr; }
+}

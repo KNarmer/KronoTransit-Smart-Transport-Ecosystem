@@ -1,0 +1,49 @@
+# --- Python (edge-ai/, middleware/fhir-service, middleware/lis-connectors, cloud-platform/api, route-analytics) ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+*.h5
+*.npy
+*.tflite
+pqi_model_data.h
+synthetic_pqi_dataset.csv
+
+# --- Node (middleware/dock-daemon, cloud-platform/web-dashboard) ---
+node_modules/
+dist/
+.vite/
+npm-debug.log*
+yarn-error.log*
+
+# --- Embedded firmware build artifacts ---
+build/
+cmake-build-*/
+*.elf
+*.bin
+*.hex
+*.map
+*.o
+*.d
+
+# --- Arduino IDE ---
+*.ino.cpp
+
+# --- Hardware CAD (large binary working files, keep exports intentionally committed) ---
+*.f3d
+*.sldprt.bak
+*~backup*
+
+# --- OS / editor cruft ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+
+# --- Secrets / local env ---
+.env
+.env.local
+*.pem
+*.key

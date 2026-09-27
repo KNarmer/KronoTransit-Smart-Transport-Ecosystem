@@ -1,0 +1,16 @@
+component,function,model_or_source,unit_cost_usd,build_stage
+Microcontroller,Core compute + onboard IMU/temp (MVP),Arduino Nano 33 BLE Sense,35.00,MVP
+Spectral Sensor,Colorimetric swatch verification (MVP),Adafruit TCS34725,8.00,MVP
+Enclosure,Two-piece carrier + cartridge (MVP),Custom 3D-printed PETG,5.00,MVP
+Degradation Indicator,Model chemical reaction (MVP),Bromothymol blue + dilute acid,2.00,MVP
+Microcontroller,Dual-core production compute,Nordic nRF5340,12.50,Production
+Microcontroller,Alternative production compute,STM32H7,9.80,Production
+VOC Sensor,Formalin/amine off-gas detection,Bosch BME688,6.20,Production
+Spectral Sensor,11-channel production optical array,AMS AS7341,4.50,Production
+IMU,6-axis high-G shock logging,STMicroelectronics LSM6DSOX,2.90,Production
+RTD Converter,Core-temperature channel,MAX31865 + PT1000 probe,7.40,Production
+RTD Converter,Ambient-temperature channel,MAX31865 + PT1000 probe,7.40,Production
+Flash Storage,Tamper-evident telemetry log,64MB SPI NOR Flash,1.10,Production
+Cartridge Shell,Injection-molded consumable body,Custom polymer mold,0.45,Production
+Cartridge Tag,RFID/NFC UID serialization,Passive NFC inlay,0.25,Production
+Cartridge Chemistry,Dry-chemistry colorimetric disc,Printed reaction membrane,0.15,Production
