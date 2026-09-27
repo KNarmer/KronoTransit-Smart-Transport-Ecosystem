@@ -29,10 +29,13 @@ set(CV_SOURCES
     src/state_machine.c
     src/flash_ringbuffer.c
     src/telemetry.c
+    src/lab_profile.c
     drivers/bme688_driver.c
     drivers/as7341_driver.c
     drivers/lsm6dsox_driver.c
     drivers/max31865_rtd.c
+    drivers/tec_driver.c
+    drivers/stiffness_actuator_driver.c
     tinyml/pqi_inference.c
 )
 

@@ -14,6 +14,7 @@ Usage:
 """
 
 import argparse
+import tempfile
 
 import numpy as np
 import pandas as pd
@@ -37,17 +38,31 @@ def representative_dataset_gen(x_sample: np.ndarray):
 def convert_to_int8_tflite(model_path: str, x_sample: np.ndarray) -> bytes:
     model = tf.keras.models.load_model(model_path)
 
-    converter = tf.lite.TFLiteConverter.from_keras_model(model)
-    converter.optimizations = [tf.lite.Optimize.DEFAULT]
-    converter.representative_dataset = lambda: representative_dataset_gen(x_sample)
-    # Full integer quantization: both input and output tensors become
-    # INT8, which is required for the TFLite Micro kernels ChronoCase's
-    # MicroMutableOpResolver links against (see pqi_inference.c's TODO).
-    converter.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS_INT8]
-    converter.inference_input_type = tf.int8
-    converter.inference_output_type = tf.int8
+    # NOTE: TFLiteConverter.from_keras_model() crashes (LLVM "missing
+    # attribute 'value'" / failed result-type inference) against Keras 3
+    # model objects, which is what tf.keras.models.load_model() returns
+    # by default under TensorFlow >= 2.16. Routing through an exported
+    # SavedModel directory and TFLiteConverter.from_saved_model() is the
+    # reliable path and is what this function does. Confirmed against
+    # TF 2.16.2 / Keras 3.15.1 — if your environment pins TF < 2.16
+    # (Keras 2 default), from_keras_model() would also work, but the
+    # SavedModel route works either way, so it's used unconditionally.
+    with tempfile.TemporaryDirectory() as tmp_saved_model_dir:
+        model.export(tmp_saved_model_dir)
+        converter = tf.lite.TFLiteConverter.from_saved_model(tmp_saved_model_dir)
+        converter.optimizations = [tf.lite.Optimize.DEFAULT]
+        converter.representative_dataset = lambda: representative_dataset_gen(x_sample)
+        # Full integer quantization: both input and output tensors become
+        # INT8, which is required for the TFLite Micro kernels ChronoCase's
+        # MicroMutableOpResolver links against (see pqi_inference.c's TODO).
+        converter.target_spec.supported_ops = [tf.lite.OpsSet.TFLITE_BUILTINS_INT8]
+        converter.inference_input_type = tf.int8
+        converter.inference_output_type = tf.int8
 
-    return converter.convert()
+        # .convert() must run while tmp_saved_model_dir still exists —
+        # from_saved_model() only records the path, the actual read
+        # happens here.
+        return converter.convert()
 
 
 def emit_c_array(tflite_bytes: bytes, out_header_path: str, var_name: str = "g_pqi_model_int8_tflite"):

@@ -16,7 +16,7 @@
 #include <stdbool.h>
 
 #define FLASH_CAPACITY_BYTES   (64UL * 1024 * 1024)  /* 64MB SPI NOR, per README hardware spec */
-#define FRAME_SIZE_BYTES       64
+#define FRAME_SIZE_BYTES       128
 #define HASH_SIZE_BYTES        32   /* SHA-256 digest */
 
 #pragma pack(push, 1)
