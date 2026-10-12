@@ -1,4 +1,4 @@
-# ChronoVerity: Smart Transport Ecosystem for Pre-Analytical Diagnostics
+# KronoTransit: Smart Transport Ecosystem for Pre-Analytical Diagnostics
 
 [![License: Apache 2.0](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
 [![Embedded Platform: ARM Cortex-M](https://img.shields.io/badge/Platform-STM32%20%7C%20Nordic%20nRF5340-brightgreen.svg)](https://www.nordicsemi.com/)
@@ -6,12 +6,12 @@
 [![Healthcare Standard: HL7 FHIR R4](https://img.shields.io/badge/Interoperability-HL7%20FHIR%20R4-firebrick.svg)](https://hl7.org/fhir/)
 [![Status: Conrad Challenge 2026–2027](https://img.shields.io/badge/Status-Conrad%20Challenge%202026--2027-9cf.svg)](https://www.conradchallenge.org/)
 
-**ChronoVerity** (`ChronoCase` active hardware + `Verity Bio` chemical indicator) is an edge-intelligent specimen
+**KronoTransit** (`ChronoCase` active hardware + `Verity Bio` chemical indicator) is an edge-intelligent specimen
 transport and quality-assurance platform built to close the single largest blind spot in hospital diagnostics: the
 **pre-analytical transit phase**, which accounts for up to **70% of all diagnostic laboratory errors**.
 
 Instead of treating liquid specimens (blood, urine, saliva) and solid tissue (biopsies, resections) as separate
-problems, ChronoVerity unifies them under one "Hub-and-Cartridge" architecture — a reusable active carrier paired
+problems, KronoTransit unifies them under one "Hub-and-Cartridge" architecture — a reusable active carrier paired
 with a low-cost consumable cartridge — that continuously monitors thermal, mechanical, and biochemical integrity
 from the moment a sample leaves the patient to the moment it docks at the lab, **with or without a network
 connection**.
@@ -53,7 +53,7 @@ paper-label-dependent. This gap is where the majority of diagnostic errors origi
   combine biological, chemical, and mechanical failure detection in a single device built for the hospital
   pre-analytical corridor (surgical suites → pneumatic tubes → couriers → central lab).
 
-ChronoVerity closes this gap with a single reusable hardware platform and a family of low-cost consumables that work
+KronoTransit closes this gap with a single reusable hardware platform and a family of low-cost consumables that work
 across both specimen types.
 
 ---
@@ -63,7 +63,7 @@ across both specimen types.
 ### The "Hub-and-Cartridge" Model
 
 Packing expensive active electronics into every single-use specimen vial makes collection prohibitively expensive.
-ChronoVerity instead uses a two-tier architecture: a reusable, sterilizable active carrier that houses all compute
+KronoTransit instead uses a two-tier architecture: a reusable, sterilizable active carrier that houses all compute
 and sensing, and a cheap, swappable consumable that holds the specimen itself.
 
 ```
@@ -91,7 +91,7 @@ consumable disc continuously **without opening the container**.
 ### Full Hardware Stack
 
 ```
-                              CHRONOVERITY ACTIVE POD (Reusable)
+                              KronoTransit ACTIVE POD (Reusable)
 
 ┌─────────────────────────────────────────────────────────────────────────────────────────────┐
 │  MCU: Dual-Core Cortex-M33/M7 @ 480MHz  │  Storage: 64MB SPI NOR Flash (Append-Only Log)     │
@@ -208,7 +208,7 @@ diagnostics inside the hospital pre-analytical transit corridor.
 
 ```
                      ┌─────────────────────────────────────────────────────────┐
-                     │               CHRONOVERITY ECOSYSTEM                    │
+                     │               KronoTransit ECOSYSTEM                    │
                      │  • Edge-AI Multi-Modal Sensing (VOC, IMU, Optics, RTD)  │
                      │  • Continuous Physical & Chemical Viability (PQI)       │
                      │  • Autonomous Zero-Connectivity Operation               │
@@ -232,14 +232,14 @@ diagnostics inside the hospital pre-analytical transit corridor.
 - **TubeSense** — Uses compact NFC/868 MHz wireless tags affixed to transport boxes or racks to log temperature
   curves against ISO 15189 standards.
   **How we win:** TubeSense functions purely as a thermometer. It cannot detect formalin leakage, un-submerged
-  floating biopsies, or cellular shear from pneumatic tube systems. ChronoVerity integrates VOC gas monitoring,
+  floating biopsies, or cellular shear from pneumatic tube systems. KronoTransit integrates VOC gas monitoring,
   11-channel multi-spectral optical evaluation, and 6-axis inertial impact logging with onboard TinyML
   classification that functions even when wireless signals drop.
 
 - **Roche Navify Sample Transport** — An enterprise software solution tracking transport timestamps, handoffs, and
   basic temperature warnings across courier networks.
   **How we win:** Navify is a clinical workflow wrapper reliant on human checkpoint scanning and generic external
-  dataloggers. ChronoVerity operates at the hardware-cartridge interface, pairing real-time physical-chemical
+  dataloggers. KronoTransit operates at the hardware-cartridge interface, pairing real-time physical-chemical
   telemetry with native HL7/FHIR serialization directly into Epic Beaker and Cerner Millennium — no third-party
   scanning portal required.
 
@@ -251,13 +251,13 @@ diagnostics inside the hospital pre-analytical transit corridor.
 
 - **Passive Colorimetric Strips (SpotSee, WarmMark)** — Disposable chemical stickers indicating an irreversible
   temperature-threshold breach.
-  **How we win:** Purely binary, non-digitized, and prone to tampering or missed readings. ChronoVerity pairs
+  **How we win:** Purely binary, non-digitized, and prone to tampering or missed readings. KronoTransit pairs
   consumable colorimetric chemistry with autonomous, non-destructive optical monitoring inside an active, reusable
   carrier.
 
 ### Feature Comparison Matrix
 
-| Capability / Metric | ChronoVerity Ecosystem | TubeSense | Roche Navify Transport | TempTale Ultra | Passive Strips (SpotSee) |
+| Capability / Metric | KronoTransit Ecosystem | TubeSense | Roche Navify Transport | TempTale Ultra | Passive Strips (SpotSee) |
 |---|---|---|---|---|---|
 | **Architecture** | Reusable Active Hub + Low-Cost Cartridge | Reusable NFC Tag on Box/Rack | Software Portal + Generic Tags | USB Data Logger | Single-Use Sticker |
 | **Monitored Modalities** | Temp, VOC Gas, Optical Turbidity, 6-Axis IMU | Temp, Timestamp | Checkpoint Scan, Temp | Temp, Humidity | Temp Breach (Binary) |
@@ -473,14 +473,14 @@ Red = *Sample Integrity Breached*.
 ## Directory Layout
 
 ```
-chronoverity-ecosystem/
+KronoTransit-ecosystem/
 ├── firmware/
 │   ├── core-mcu/               # Production STM32 / nRF5340 C/C++ firmware
 │   │   ├── drivers/            # BME688, AS7341, LSM6DSOX, MAX31865 drivers
 │   │   ├── tinyml/             # Quantized TFLite Micro PQI model and kernels
 │   │   └── src/                # State machine, flash ring-buffer, encryption
 │   └── mvp-arduino/            # Conrad Challenge Arduino Nano 33 BLE Sense build
-│       ├── ChronoVerity_MVP.ino
+│       ├── KronoTransit_MVP.ino
 │       └── sensor_processing.cpp
 ├── edge-ai/
 │   ├── datasets/               # Simulated thermal, shock, and spectral drift datasets
@@ -523,7 +523,7 @@ These steps cover the **Conrad Challenge MVP build** (Arduino Nano 33 BLE Sense 
 
 ```bash
 cd firmware/mvp-arduino
-# Open ChronoVerity_MVP.ino in the Arduino IDE, select
+# Open KronoTransit_MVP.ino in the Arduino IDE, select
 # Tools > Board > Arduino Nano 33 BLE, then Upload.
 ```
 
