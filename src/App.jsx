@@ -6,6 +6,7 @@ import { TopBar, Footer, RouteScan } from './components/Shell.jsx';
 import Overview from './pages/Overview.jsx';
 import SideRigs from './components/SideRigs.jsx';
 
+const Why = lazy(() => import('./pages/Why.jsx'));
 const PodArch = lazy(() => import('./pages/PodArch.jsx'));
 const LabReports = lazy(() => import('./pages/LabReports.jsx'));
 const Engineering = lazy(() => import('./pages/Engineering.jsx'));
@@ -13,6 +14,7 @@ const Grants = lazy(() => import('./pages/Grants.jsx'));
 
 const RIGS = {
   '/': ['lsm6', 'rtc', 'bme', 'gauge'],
+  '/why': ['as7341', 'lsm6', 'rtc', 'bme'],
   '/pod': ['nfc', 'h3lis', 'core', 'boost'],
   '/lab-reports': ['as7341', 'rtc', 'magDock', 'lsm6'],
   '/engineering': ['pp1', 'gauge', 'pp2', 'chg'],
@@ -38,6 +40,7 @@ export default function App() {
           <Suspense fallback={<div className="page-wait" />}>
             <Routes location={location}>
               <Route path="/" element={<Overview />} />
+              <Route path="/why" element={<Why />} />
               <Route path="/pod" element={<PodArch />} />
               <Route path="/lab-reports" element={<LabReports />} />
               <Route path="/engineering" element={<Engineering />} />

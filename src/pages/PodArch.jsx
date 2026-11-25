@@ -99,7 +99,7 @@ export default function PodArch() {
       </section>
       <section className="wrap section xs-wrap">
         <Reveal><Kicker>Cross-section</Kicker><h2 className="h2">How the layers stack.</h2></Reveal>
-        <div className="xs-grid">
+        <div className="xs-full">
           <CrossSection />
         </div>
       </section>

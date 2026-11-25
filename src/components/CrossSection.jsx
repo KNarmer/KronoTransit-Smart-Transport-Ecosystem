@@ -1,36 +1,74 @@
 // Section view of the pod, to scale (2.4 px per mm), drawn like a mechanical drawing.
+// Labels sit in two columns either side of the drawing; their rows are spread so no two
+// ever touch, and each leader elbows from its part to its row. On narrow screens the
+// labels become numbered callouts with a legend underneath, so text never shrinks to dust.
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { ease } from '../motion.js';
-import Prov from './Prov.jsx';
 
 const S = 2.4; // px per mm
-const X0 = 250, Y0 = 40; // drawing origin (top-left of shell)
+const LEFT_COL = 330; // width reserved for left labels
+const X0 = LEFT_COL + 40, Y0 = 40; // drawing origin (top-left of shell)
 const W = 190 * S, H = 160 * S;
 const y = (mm) => Y0 + H - mm * S; // mm from the floor
 const x = (mm) => X0 + mm * S;
+const RIGHT_X = X0 + W + 96; // where right labels start
+const VB_W = RIGHT_X + 380;
+const VB_H = Y0 + H + 72;
+const GAP = 34; // minimum vertical distance between label rows
 
-const labels = [
-  // [text, anchor x mm, anchor y mm, label side]
+// [text, anchor x mm, anchor y mm, side]
+const LABELS = [
   ['Lid · 14 mm, O-ring seal, light pipe', 150, 153, 'r'],
-  ['XPS foam well · 4 × 25 mm', 170, 110, 'r'],
-  ['Cold pack', 160, 75, 'r'],
-  ['Glass vial in keyed collar', 95, 118, 'r'],
+  ['Glass vial in keyed collar', 100, 118, 'r'],
+  ['XPS foam well · 4 × 25 mm', 176, 110, 'r'],
+  ['Cold pack (one each side)', 160, 80, 'r'],
   ['Cradle on Sorbothane feet', 120, 58, 'r'],
-  ['Mid deck · 45 mm', 175, 45, 'r'],
-  ['Battery · charger · fuel gauge', 40, 18, 'l'],
-  ['nRF5340 DK on 12 mm standoffs', 140, 24, 'r'],
-  ['Colour sensor at optical window', 70, 96, 'l'],
-  ['Core PT1000 clipped to glass', 82, 132, 'l'],
-  ['Gas sensor at vent', 30, 112, 'l'],
+  ['Mid deck · 45 mm', 178, 45, 'r'],
+  ['nRF5340 DK on 12 mm standoffs', 150, 26, 'r'],
+  ['Core PT1000 clipped to glass', 84, 126, 'l'],
+  ['Gas sensor at vent', 34, 110, 'l'],
+  ['Colour sensor at optical window', 72, 96, 'l'],
+  ['Battery · charger · fuel gauge', 40, 21, 'l'],
 ];
 
+// spread rows so none are closer than GAP, keeping them inside the drawing's height
+function spread(items) {
+  const rows = items.map((it) => ({ ...it, ty: it.ay })).sort((a, b) => a.ay - b.ay);
+  for (let i = 1; i < rows.length; i++) rows[i].ty = Math.max(rows[i].ty, rows[i - 1].ty + GAP);
+  const over = rows[rows.length - 1].ty - (Y0 + H);
+  if (over > 0) rows.forEach((r) => { r.ty -= over; });
+  for (let i = rows.length - 2; i >= 0; i--) rows[i].ty = Math.min(rows[i].ty, rows[i + 1].ty - GAP);
+  return rows;
+}
+
+const PLACED = (() => {
+  const all = LABELS.map(([t, mx, my, side], i) => ({ t, side, n: i + 1, ax: x(mx), ay: y(my) }));
+  return [...spread(all.filter((l) => l.side === 'r')), ...spread(all.filter((l) => l.side === 'l'))]
+    .sort((a, b) => a.n - b.n);
+})();
+
+function useNarrow(q = '(max-width: 760px)') {
+  const [m, setM] = useState(() => typeof window !== 'undefined' && window.matchMedia(q).matches);
+  useEffect(() => {
+    const mq = window.matchMedia(q);
+    const on = () => setM(mq.matches);
+    mq.addEventListener('change', on);
+    return () => mq.removeEventListener('change', on);
+  }, [q]);
+  return m;
+}
+
 export default function CrossSection() {
+  const narrow = useNarrow();
   const draw = (d, cls, delay = 0) => (
     <motion.path d={d} className={cls} initial={{ pathLength: 0 }} whileInView={{ pathLength: 1 }} viewport={{ once: true, margin: '-10% 0px' }} transition={{ duration: 1.1, ease, delay }} />
   );
+  // narrow: crop to the drawing plus its dimension lines
+  const vb = narrow ? `${X0 - 24} ${Y0 - 40} ${W + 96} ${H + 112}` : `0 0 ${VB_W} ${VB_H}`;
   return (
-    <figure className="xs">
-      <svg viewBox="0 0 1040 500" role="img" aria-label="Cross-section of the pod showing lid, foam well, vial, cradle, mid deck and electronics">
+    <figure className={`xs ${narrow ? 'xs-narrow' : ''}`}>
+      <svg viewBox={vb} role="img" aria-label="Cross-section of the pod showing lid, foam well, vial, cradle, mid deck and electronics">
         <defs>
           <pattern id="hatch" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0V7" className="hatch" /></pattern>
           <pattern id="foam" width="10" height="10" patternUnits="userSpaceOnUse"><circle cx="5" cy="5" r="1.1" className="foamdot" /></pattern>
@@ -65,26 +103,41 @@ export default function CrossSection() {
         <rect x={x(95)} y={y(28)} width={85 * S} height={4 * S} className="xs-pcb" />
         {[100, 172].map((m) => <rect key={m} x={x(m)} y={y(24)} width="6" height={12 * S} className="xs-std" />)}
         {/* dimension lines */}
-        {draw(`M${X0} ${Y0 + H + 34}H${X0 + W}`, 'dim')}
-        {draw(`M${X0} ${Y0 + H + 26}v16M${X0 + W} ${Y0 + H + 26}v16`, 'dim')}
-        <text x={X0 + W / 2} y={Y0 + H + 54} className="dim-t" textAnchor="middle">190 mm</text>
-        {draw(`M${X0 + W + 34} ${Y0}V${Y0 + H}`, 'dim', 0.2)}
-        {draw(`M${X0 + W + 26} ${Y0}h16M${X0 + W + 26} ${Y0 + H}h16`, 'dim', 0.2)}
-        <text x={X0 + W + 46} y={Y0 + H / 2} className="dim-t" transform={`rotate(90 ${X0 + W + 46} ${Y0 + H / 2})`} textAnchor="middle">160 mm</text>
+        {draw(`M${X0} ${Y0 + H + 30}H${X0 + W}`, 'dim')}
+        {draw(`M${X0} ${Y0 + H + 22}v16M${X0 + W} ${Y0 + H + 22}v16`, 'dim')}
+        <text x={X0 + W / 2} y={Y0 + H + 56} className="dim-t" textAnchor="middle">190 mm</text>
+        {draw(`M${X0 + W + 30} ${Y0}V${Y0 + H}`, 'dim', 0.2)}
+        {draw(`M${X0 + W + 22} ${Y0}h16M${X0 + W + 22} ${Y0 + H}h16`, 'dim', 0.2)}
+        <text x={X0 + W + 30} y={Y0 - 14} className="dim-t" textAnchor="middle">160 mm</text>
         {/* leaders */}
-        {labels.map(([t, mx, my, side], i) => {
-          const ax = x(mx), ay = y(my);
-          const lx = side === 'r' ? X0 + W + 70 : 10;
+        {PLACED.map(({ t, side, n, ax, ay, ty }, i) => {
+          if (narrow) {
+            return (
+              <g key={t} className="lead">
+                <circle cx={ax} cy={ay} r="13" className="lead-badge" />
+                <text x={ax} y={ay + 5} className="lead-n" textAnchor="middle">{n}</text>
+              </g>
+            );
+          }
+          const r = side === 'r';
+          const elbow = r ? X0 + W + 66 : X0 - 26;
+          const end = r ? RIGHT_X - 10 : LEFT_COL + 10;
+          const d = `M${ax} ${ay}H${elbow}L${r ? elbow + 14 : elbow - 14} ${ty}H${end}`;
           return (
             <g key={t} className="lead">
-              {draw(`M${ax} ${ay}L${side === 'r' ? lx - 8 : X0 - 12} ${ay}`, 'lead-l', 0.3 + i * 0.04)}
-              <circle cx={ax} cy={ay} r="2.6" className="lead-dot" />
-              <text x={side === 'r' ? lx : lx} y={ay + 4} className={`lead-t ${side}`}>{t}</text>
+              {draw(d, 'lead-l', 0.3 + i * 0.04)}
+              <circle cx={ax} cy={ay} r="3.2" className="lead-dot" />
+              <text x={r ? RIGHT_X : LEFT_COL} y={ty + 6} className="lead-t" textAnchor={r ? 'start' : 'end'}>{t}</text>
             </g>
           );
         })}
       </svg>
-      <figcaption className="mono">Section A–A · to scale</figcaption>
+      {narrow && (
+        <ol className="xs-legend">
+          {LABELS.map(([t]) => <li key={t}>{t}</li>)}
+        </ol>
+      )}
+      <figcaption className="mono">Section A–A · to scale · 2.4 px per mm</figcaption>
     </figure>
   );
 }

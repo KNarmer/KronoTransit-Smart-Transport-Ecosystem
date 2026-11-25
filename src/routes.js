@@ -1,5 +1,6 @@
 export const ROUTES = [
   { path: '/', label: 'Overview', slug: 'overview' },
+  { path: '/why', label: 'Why It Matters', slug: 'why-it-matters' },
   { path: '/pod', label: 'Pod Architecture', slug: 'pod-architecture' },
   { path: '/lab-reports', label: 'Lab Reports', slug: 'lab-reports' },
   { path: '/engineering', label: 'Engineering & BOM', slug: 'engineering' },

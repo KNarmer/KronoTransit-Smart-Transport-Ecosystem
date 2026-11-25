@@ -10,6 +10,7 @@ import { Reveal, Kicker } from '../components/Bits.jsx';
 import { Rig, Hang, Peek, Bench } from '../components/Rig.jsx';
 import Telemetry from '../components/Telemetry.jsx';
 import InAction from '../components/InAction.jsx';
+import { StakesBanner } from '../components/WhyParts.jsx';
 
 const PodViewer = lazy(() => import('../components/PodViewer.jsx'));
 
@@ -63,6 +64,7 @@ export default function Overview() {
         </figure>
       </section>
 
+      <StakesBanner compact />
       <Telemetry />
       <PcbHero />
 
@@ -90,6 +92,7 @@ export default function Overview() {
           <p className="student-line">Designed, wired and coded by high school students.</p>
           <div className="hero-links center">
             <Link className="go go-strong" to="/grants">Help us pilot it <span>→</span></Link>
+            <Link className="go" to="/why">Why it matters <span>→</span></Link>
             <Link className="go" to="/engineering">See the engineering <span>→</span></Link>
           </div>
         </Reveal>
