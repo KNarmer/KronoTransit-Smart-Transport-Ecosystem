@@ -5,6 +5,7 @@ import { SCENARIOS, BAND } from '../data/scenarios.js';
 import Report from '../components/Report.jsx';
 import { Reveal, Kicker } from '../components/Bits.jsx';
 import { Hang, Peek } from '../components/Rig.jsx';
+import Telemetry from '../components/Telemetry.jsx';
 
 const fhir = (sc) => JSON.stringify({
   resourceType: 'Observation',
@@ -36,6 +37,7 @@ export default function LabReports() {
         <p className="flag mono">Illustrative demo data · not bench measurements · no clinical validation yet</p>
       </section>
 
+      <Telemetry />
       <section className="wrap scen">
         <div className="scen-pick" role="tablist" aria-label="Scenario">
           {SCENARIOS.map((s) => (

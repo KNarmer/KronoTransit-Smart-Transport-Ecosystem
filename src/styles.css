@@ -632,3 +632,71 @@ h1, h2, h3, h4 { margin: 0; font-weight: 500; text-wrap: balance; }
   .circuit { padding-top: 360px; }
 }
 @media (prefers-reduced-motion: reduce) { .rig.sway, .rig-led circle:first-child { animation: none; } }
+
+/* =================== round 3: more motion, no vertical accent lines, less empty space =================== */
+.prov { border-left: 0; border-radius: 3px; padding: 3px 6px 2px; }
+.flag { border-left: 0; padding-left: 0; }
+.hud, .scope-read, .hero-tip { border-left: 0; box-shadow: 0 18px 40px -18px rgba(0,0,0,0.45); border-radius: 6px; }
+.tree-a { border-left: 0; border-radius: 6px; padding-left: 12px; }
+.tree-a.on { background: color-mix(in srgb, var(--accent) 12%, transparent); }
+.section { padding-top: clamp(72px, 7vw, 112px); }
+.lead-block { padding-top: clamp(48px, 6vw, 88px); }
+.foot { margin-top: clamp(72px, 8vw, 120px); }
+
+/* hanging boards swing in 3D */
+.rig.sway { transform-origin: 50% 0; animation: swing3d 8s ease-in-out infinite; }
+@keyframes swing3d {
+  0%, 100% { transform: perspective(900px) rotateZ(-2deg) rotateY(-14deg); }
+  50% { transform: perspective(900px) rotateZ(2deg) rotateY(14deg); }
+}
+.rig-wit-hang { left: max(8px, calc((100vw - 1340px) / 2 - 40px)); top: -30px; width: 170px; animation-delay: -3s; }
+.rig-st-a { left: 18%; top: -40px; width: 150px; animation-delay: -1s; }
+.rig-st-b { right: 18%; top: -40px; width: 150px; animation-delay: -4.5s; }
+.rig-gal { top: 0; width: 420px; }
+.rig-gal-hang { right: 30%; top: -60px; width: 150px; animation-delay: -2s; }
+.student { min-height: 380px; display: grid; align-content: center; }
+
+/* telemetry band */
+.telemetry { position: relative; overflow: hidden; margin: clamp(36px, 5vw, 64px) 0 0; padding: 14px 0; display: grid; gap: 6px;
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); -webkit-mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent); }
+.tl-lane { position: relative; height: 40px; }
+.tl-svg { position: absolute; inset: 0; width: 200%; height: 100%; overflow: visible; }
+.tl-path { fill: none; stroke-width: 1.6; vector-effect: non-scaling-stroke; animation: tlmove 16s linear infinite; }
+.tl-temp .tl-path { stroke: var(--sig-2); } .tl-g .tl-path { stroke: var(--bad); } .tl-gas .tl-path { stroke: var(--sig); }
+@keyframes tlmove { to { transform: translateX(-50%); } }
+.tl-label { position: absolute; left: 10%; top: 0; z-index: 1; background: var(--bg); padding: 0 8px; }
+.tl-scan { position: absolute; top: 0; bottom: 0; width: 120px; background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--accent) 18%, transparent), transparent); animation: tlscan 5s linear infinite; }
+@keyframes tlscan { from { left: -10%; } to { left: 110%; } }
+.tl-alt .tl-path { animation-direction: reverse; }
+
+/* 3D spinner */
+.lead-split { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; align-items: center; }
+.lead-split > div .h1, .lead-split > div .lede { max-width: none; }
+.spinner { position: relative; margin: 0; height: clamp(380px, 38vw, 560px); }
+.spinner::before { content: ''; position: absolute; inset: 8% 10%; border-radius: 50%; background: radial-gradient(closest-side, color-mix(in srgb, var(--accent) 16%, transparent), transparent); }
+.spinner-gl { position: absolute; inset: 0; }
+.spinner figcaption { position: absolute; left: 0; right: 0; bottom: 4px; text-align: center; }
+
+/* boards tilt in 3D under the cursor */
+.gallery { perspective: 900px; }
+.gal-img img { transition: transform 500ms var(--ease); transform-style: preserve-3d; }
+@media (hover: hover) and (pointer: fine) { .gal:hover .gal-img img { transform: rotateX(18deg) rotateY(-18deg) translateY(-10px) scale(1.06); } }
+.gal-img { animation: bob 6s ease-in-out infinite; }
+.gal:nth-child(2n) .gal-img { animation-delay: -2s; } .gal:nth-child(3n) .gal-img { animation-delay: -4s; }
+@keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+/* a signal travels along the plan */
+.path::after { content: ''; position: absolute; top: 3px; left: 0; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 12px var(--accent); animation: travel 6s linear infinite; }
+@keyframes travel { from { left: 0; } to { left: calc(100% - 8px); } }
+
+@media (max-width: 860px) {
+  .lead-split { grid-template-columns: 1fr; }
+  .rig-st-a, .rig-st-b, .rig-wit-hang, .rig-gal-hang { display: none; }
+  .path::after { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { .tl-path, .tl-scan, .gal-img, .path::after { animation: none; } }
+.circuit { min-height: 900px; }
+.ports-wrap .rig-lead, .ports-wrap .rig-lead2 { top: 0; }
+.spinner { height: clamp(420px, 42vw, 620px); }
+.journey-step { min-height: 46vh; }
+.journey-steps { padding: 12vh 0 18vh; }

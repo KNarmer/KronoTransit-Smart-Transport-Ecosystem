@@ -8,6 +8,7 @@ import Journey from '../components/Journey.jsx';
 import Witnesses from '../components/Witnesses.jsx';
 import { Reveal, Kicker } from '../components/Bits.jsx';
 import { Rig, Hang, Peek } from '../components/Rig.jsx';
+import Telemetry from '../components/Telemetry.jsx';
 
 const PodViewer = lazy(() => import('../components/PodViewer.jsx'));
 
@@ -61,6 +62,7 @@ export default function Overview() {
         </figure>
       </section>
 
+      <Telemetry />
       <PcbHero />
 
       <section className="section journey-wrap">
@@ -69,7 +71,9 @@ export default function Overview() {
         <Journey />
       </section>
 
+      <Telemetry className="tl-alt" />
       <section className="wrap section wit-wrap">
+        <Hang id="lsm6" className="rig-wit-hang" colors={['white', 'blue', 'black']} len={200} w={190} rot={-9} />
         <Peek id="h3lis" side="right" className="rig-wit" colors={['orange', 'black', 'white']} />
         <Reveal className="sec-intro">
           <Kicker>Five witnesses</Kicker>
@@ -81,6 +85,8 @@ export default function Overview() {
 
       <section className="wrap section student">
         <Peek id="bat" side="left" className="rig-student" rot={14} colors={['red', 'black']} />
+        <Hang id="rtc" className="rig-st-a" colors={['yellow', 'black', 'red']} len={180} w={170} rot={8} />
+        <Hang id="gauge" className="rig-st-b" colors={['purple', 'orange']} len={260} w={160} rot={-14} />
         <Reveal>
           <p className="student-line">Designed, wired and coded by high school students.</p>
           <div className="hero-links center">

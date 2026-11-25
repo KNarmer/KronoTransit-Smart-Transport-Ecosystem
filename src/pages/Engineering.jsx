@@ -5,6 +5,8 @@ import BusExplorer from '../components/BusExplorer.jsx';
 import CostExplorer from '../components/CostExplorer.jsx';
 import { Reveal, Kicker } from '../components/Bits.jsx';
 import { Hang, Peek, hw } from '../components/Rig.jsx';
+import Telemetry from '../components/Telemetry.jsx';
+import PodSpinner from '../components/PodSpinner.jsx';
 
 const RAILS = [
   ['VBAT', '3.0–4.2 V', 'LiPo through the fuel gauge', '≈0.20 A worst case'],
@@ -22,14 +24,19 @@ export default function Engineering() {
   const gallery = COMPONENTS.filter((c) => c.img);
   return (
     <>
-      <section className="wrap lead-block">
-        <Peek id="pp1" side="right" className="rig-lead-peek" w={460} colors={['red', 'black', 'yellow', 'blue']} />
-        <Kicker>Engineering & BOM</Kicker>
-        <h1 className="h1">Every board, every wire, every dollar.</h1>
-        <p className="lede">Off-the-shelf boards today, one custom PCB tomorrow. Hover anything to dig in.</p>
+      <section className="wrap lead-block lead-split">
+        <div>
+          <Kicker>Engineering & BOM</Kicker>
+          <h1 className="h1">Every board, every wire, every dollar.</h1>
+          <p className="lede">Off-the-shelf boards today, one custom PCB tomorrow.</p>
+        </div>
+        <PodSpinner exploded caption="The prototype, exploded · hover a part" />
       </section>
+      <Telemetry />
 
       <section className="wrap section gallery-wrap">
+        <Peek id="pp1" side="right" className="rig-gal" w={460} colors={['red', 'black', 'yellow', 'blue']} />
+        <Hang id="h3lis" className="rig-gal-hang" colors={['orange', 'black', 'white']} len={160} w={170} rot={10} />
         <Reveal><Kicker>The parts</Kicker><h2 className="h2">Meet the hardware.</h2></Reveal>
         <ul className="gallery">
           {gallery.map((c, i) => (
@@ -37,7 +44,6 @@ export default function Engineering() {
               <div className="gal-img"><img src={hw(c.img)} alt="" loading="lazy" /></div>
               <h3 className="h4">{c.name}</h3>
               <p>{c.role.split('.')[0]}.</p>
-              <p className="gal-spec">{c.specs[0][1]} <Prov k={c.specs[0][2]} src={c.ref[0]} /></p>
             </Reveal>
           ))}
         </ul>
@@ -89,7 +95,7 @@ export default function Engineering() {
               <span className="path-dot" />
               <span className="mono">{i === 0 ? 'We are here' : `Step ${i + 1}`}</span>
               <h3 className="h4">{h}</h3>
-              <p className="path-cost">{cost} <Prov k={k} /></p>
+              <p className="path-cost">{cost}</p>
             </Reveal>
           ))}
         </ol>
@@ -99,11 +105,6 @@ export default function Engineering() {
         <Peek id="boost" side="left" className="rig-cost" w={300} rot={16} colors={['red', 'black']} />
         <Reveal><Kicker>Cost</Kicker><h2 className="h2">One pod at 1, 50 and 1,000.</h2></Reveal>
         <CostExplorer />
-        <div className="cart-cost">
-          {CARTRIDGE.map(([n, v, k]) => (
-            <div key={n}><span className="mono">{n}</span><b>${v.toFixed(2)}</b> <Prov k={k} /></div>
-          ))}
-        </div>
       </section>
     </>
   );

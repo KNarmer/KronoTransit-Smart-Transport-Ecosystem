@@ -6,6 +6,7 @@ import Prov from '../components/Prov.jsx';
 import { Reveal, Kicker } from '../components/Bits.jsx';
 import CrossSection from '../components/CrossSection.jsx';
 import { Hang, Peek } from '../components/Rig.jsx';
+import Telemetry from '../components/Telemetry.jsx';
 
 const PodViewer = lazy(() => import('../components/PodViewer.jsx'));
 const GROUPS = ['Cartridge well', 'Backbone', 'Base tray', 'Shell', 'KronoDock'];
@@ -40,6 +41,7 @@ export default function PodArch() {
     <>
       <section className="wrap lead-block">
         <Hang id="nfc" className="rig-lead" colors={['blue', 'white', 'black', 'red', 'yellow']} />
+        <Hang id="lsm6" className="rig-lead2" colors={['green', 'black', 'white']} len={200} w={180} rot={-10} />
         <Kicker>Pod Architecture</Kicker>
         <h1 className="h1">Seventeen subsystems in a lunch-tin-sized box.</h1>
         <p className="lede">Pick a part. The camera flies to it and everything else turns to glass.</p>
@@ -48,7 +50,7 @@ export default function PodArch() {
       <section className="explore">
         <div className="explore-stage">
           <motion.div className="explore-gl" initial={{ opacity: 0 }} animate={{ opacity: ready ? 1 : 0 }} transition={{ duration: 0.8, ease }}>
-            <Suspense fallback={null}><PodViewer apiRef={api} onReady={onReady} onPick={onPick} onHover={setHover} /></Suspense>
+            <Suspense fallback={null}><PodViewer apiRef={api} onReady={onReady} onPick={onPick} onHover={setHover} zoom /></Suspense>
           </motion.div>
           {!ready && <p className="explore-wait mono">Loading model · 164 parts</p>}
           <div className="explore-ctl">
@@ -102,6 +104,7 @@ export default function PodArch() {
         </nav>
       </section>
 
+      <Telemetry />
       <section className="wrap section xs-wrap">
         <Peek id="pp2" side="right" className="rig-xs" colors={['red', 'blue', 'yellow']} />
         <Reveal><Kicker>Cross-section</Kicker><h2 className="h2">How the layers stack.</h2></Reveal>

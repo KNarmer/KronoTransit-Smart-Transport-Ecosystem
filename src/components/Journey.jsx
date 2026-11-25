@@ -27,12 +27,15 @@ function Stage({ i }) {
   );
 }
 
-function Pod({ x = 300, y = 250, open = false }) {
+function Pod({ x = 300, y = 250, open = false, children }) {
   return (
     <g transform={`translate(${x} ${y})`}>
       <rect x="0" y="40" width="200" height="150" rx="10" className="j-body" />
       <rect x="14" y="54" width="172" height="122" rx="6" className="j-inner" />
-      <motion.rect x="-4" y="22" width="208" height="20" rx="5" className="j-lid" initial={{ rotate: 0 }} animate={{ rotate: open ? -28 : 0 }} style={{ transformBox: 'fill-box', transformOrigin: '0% 100%' }} transition={{ duration: 0.8, ease }} />
+      {children}
+      <motion.rect x="-4" y="22" width="208" height="20" rx="5" className="j-lid"
+        animate={open ? { y: [0, -86, -86, 0, 0] } : { y: 0 }}
+        transition={open ? { duration: 2.8, times: [0, 0.2, 0.62, 0.8, 1], ease: 'easeInOut', repeat: Infinity } : {}} />
       <circle cx="176" cy="32" r="4" className="j-led" />
     </g>
   );
@@ -41,12 +44,14 @@ function Pod({ x = 300, y = 250, open = false }) {
 function Load() {
   return (
     <g>
-      <Pod open />
-      <motion.g initial={{ y: -120 }} animate={{ y: 0 }} transition={{ duration: 1.4, ease, repeat: Infinity, repeatDelay: 1.4 }}>
-        <rect x="388" y="150" width="24" height="96" rx="12" className="j-vial" />
-        <rect x="388" y="196" width="24" height="50" rx="10" className="j-blood" />
-        <rect x="384" y="146" width="32" height="12" rx="2" className="j-cap" />
-      </motion.g>
+      <Pod open>
+        {/* vial drops into the well while the lid is up, then the lid closes over it */}
+        <motion.g animate={{ y: [-210, -210, 0, 0] }} transition={{ duration: 2.8, times: [0, 0.22, 0.6, 1], ease: 'easeInOut', repeat: Infinity }}>
+          <rect x="88" y="66" width="24" height="96" rx="12" className="j-vial" />
+          <rect x="88" y="112" width="24" height="50" rx="10" className="j-blood" />
+          <rect x="84" y="62" width="32" height="12" rx="2" className="j-cap" />
+        </motion.g>
+      </Pod>
       {[0, 1, 2].map((k) => (
         <motion.circle key={k} cx="400" cy="330" r={30} className="j-ring" initial={{ scale: 0.6, opacity: 0.8 }} animate={{ scale: 1.8 + k * 0.4, opacity: 0 }}
           transition={{ duration: 1.6, delay: 1.2 + k * 0.25, repeat: Infinity, repeatDelay: 1.2 }} />

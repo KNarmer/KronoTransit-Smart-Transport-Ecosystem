@@ -5,6 +5,8 @@ import { REPO } from '../routes.js';
 import { Reveal, Kicker } from '../components/Bits.jsx';
 import Prov from '../components/Prov.jsx';
 import { Hang, Peek } from '../components/Rig.jsx';
+import PodSpinner from '../components/PodSpinner.jsx';
+import Telemetry from '../components/Telemetry.jsx';
 
 // Add a public contact address here when you have one; until then, visitors are sent to GitHub.
 const CONTACT_EMAIL = '';
@@ -59,15 +61,19 @@ function Port({ code, title, text, subject, i }) {
 export default function Grants() {
   return (
     <>
-      <section className="wrap lead-block grants-hero">
-        <Hang id="magDock" className="rig-lead" colors={['red', 'black', 'white', 'green', 'yellow']} w={280} rot={6} />
-        <Hang id="gauge" className="rig-lead2" colors={['orange', 'purple']} len={240} w={180} rot={-12} />
-        <Kicker>Grants & Team</Kicker>
-        <h1 className="h1">We’ve got the wiring. <em>Got a power supply?</em></h1>
-        <p className="lede">We’re high school students looking for grants, pilot sites and mentors. No funding yet — that’s what this page is for.</p>
+      <section className="wrap lead-block grants-hero lead-split">
+        <div>
+          <Kicker>Grants & Team</Kicker>
+          <h1 className="h1">We’ve got the wiring. <em>Got a power supply?</em></h1>
+          <p className="lede">High school students looking for grants, pilot sites and mentors. No funding yet — that’s what this page is for.</p>
+        </div>
+        <PodSpinner caption="This is what you’d be powering · drag me" spin={1.2} />
       </section>
+      <Telemetry />
 
-      <section className="wrap section">
+      <section className="wrap section ports-wrap">
+        <Hang id="magDock" className="rig-lead" colors={['red', 'black', 'white', 'green', 'yellow']} w={260} rot={6} />
+        <Hang id="as7341" className="rig-lead2" colors={['orange', 'purple', 'blue']} len={220} w={170} rot={-12} />
         <Reveal><Kicker>Plug in</Kicker><h2 className="h2">Five ways to connect.</h2></Reveal>
         <ul className="ports">
           {PORTS.map(([code, title, text, subject], i) => <Port key={code} code={code} title={title} text={text} subject={subject} i={i} />)}

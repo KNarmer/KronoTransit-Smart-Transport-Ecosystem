@@ -12,7 +12,7 @@ import { POD_GLB, DRACO } from './model.js';
 
 const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
-export default function PodViewer({ onReady, onPick, onHover, apiRef, startExploded = false, autoRotate = false }) {
+export default function PodViewer({ onReady, onPick, onHover, apiRef, startExploded = false, autoRotate = false, zoom = false, spin = 0.5, near = 1 }) {
   const wrapRef = useRef(null);
 
   useEffect(() => {
@@ -47,9 +47,9 @@ export default function PodViewer({ onReady, onPick, onHover, apiRef, startExplo
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true; controls.dampingFactor = 0.1;
     controls.enablePan = false;
-    controls.enableZoom = true; controls.zoomSpeed = 0.6;
+    controls.enableZoom = zoom; controls.zoomSpeed = 0.6;
     controls.minPolarAngle = 0.25; controls.maxPolarAngle = 1.45;
-    controls.autoRotate = autoRotate && !reduce; controls.autoRotateSpeed = 0.5;
+    controls.autoRotate = autoRotate && !reduce; controls.autoRotateSpeed = spin;
     controls.addEventListener('start', () => { controls.autoRotate = false; });
 
     const parts = []; // { node, label, base: Vector3, off: Vector3, meshes: Mesh[] }
@@ -144,8 +144,8 @@ export default function PodViewer({ onReady, onPick, onHover, apiRef, startExplo
 
       const hgt = box.max.y - box.min.y;
       // The hero opens the pod, so frame the taller exploded stack from further back.
-      if (startExploded) { controls.target.set(0, hgt * 0.95, 0); camera.position.set(6.2, hgt * 0.95 + 4.2, 14.5); }
-      else { controls.target.set(0, hgt * 0.3, 0); camera.position.set(4.5, 4.2, 10.5); }
+      if (startExploded) { controls.target.set(0, hgt * 0.95, 0); camera.position.set(6.2 * near, hgt * 0.95 + 4.2 * near, 14.5 * near); }
+      else { controls.target.set(0, hgt * 0.3, 0); camera.position.set(4.5 * near, 4.2 * near, 10.5 * near); }
       controls.update();
       home = { p: camera.position.clone(), t: controls.target.clone() };
       onReady?.(parts.map((p) => p.label));
