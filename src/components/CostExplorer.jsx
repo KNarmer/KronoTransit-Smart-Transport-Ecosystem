@@ -29,7 +29,7 @@ export default function CostExplorer() {
         <div className="cost-head">
           <div>
             <p className="cost-big">{usd(total)}<small> per unit</small> <Prov k={t.prov} /></p>
-            <p className="cost-tot">{t.qty.toLocaleString()} units → {usd(total * t.qty, 0)} total</p>
+            <p className="cost-tot">{t.qty === 1 ? '1 unit' : `${t.qty.toLocaleString()} units`} → {usd(total * t.qty, 0)} total</p>
           </div>
         </div>
 

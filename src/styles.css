@@ -759,3 +759,54 @@ body { font-size: 16.5px; }
   .rig-top { width: 110px; right: 8px; }
   .lead-split > .sci { min-height: 340px; }
 }
+
+/* =================== round 5: tidy =================== */
+/* no italics anywhere */
+em, i, cite, blockquote, .student-line, .foot-tag, .h1 em { font-style: normal !important; }
+
+/* workbench strip above the footer */
+.rig.bench { position: relative; display: block; width: min(100%, 1500px); height: auto; margin: clamp(48px, 6vw, 80px) auto 0; padding: 0 var(--gut); overflow: visible; }
+
+/* less empty space at the bottom of pages */
+.page { min-height: 0; }
+.foot { margin-top: 24px; padding: 32px var(--gut) 36px; border-top: 0; gap: 10px; }
+.journey-steps { padding: 10vh 0 6vh; }
+.student { min-height: 0; padding-bottom: 0; }
+.rep-more { padding-top: 40px; }
+.founder-photo { aspect-ratio: 1 / 1; max-width: 260px; }
+.founder-bio { min-height: 0; }
+
+/* fewer rules and grids: dot fields instead of line grids, no row dividers */
+.scope, .explore-stage, .sci, .founder-photo {
+  background-image: radial-gradient(color-mix(in srgb, var(--ink) 16%, transparent) 1px, transparent 1.2px) !important;
+  background-size: 22px 22px !important;
+  background-color: color-mix(in srgb, var(--ink) 3%, transparent) !important;
+  border: 0 !important;
+}
+.explore-stage, .scope, .sci { border-radius: 14px; overflow: hidden; }
+.stream, .readout dl div, .log td, .reg td, .reg tbody th, .rails th, .rails td, .cost-table th, .cost-table td, .lines td, .ledger-points li, .defs div, .dates li, .layers li { border: 0 !important; }
+.log tbody tr:nth-child(odd) td, .reg tbody tr:nth-child(odd) td, .reg tbody tr:nth-child(odd) th { background: color-mix(in srgb, var(--ink) 4%, transparent); }
+.more, .triage, .rep-head, .bus-sheet, .sec-label, .wit-triggers, .cost-tiers, .path::before { border: 0 !important; }
+.path::before { display: none; }
+.more summary { padding: 12px 0; }
+.bus-sheet { border-radius: 14px; background: color-mix(in srgb, var(--ink) 3%, transparent); }
+.triage { background: color-mix(in srgb, var(--ink) 4%, transparent); border-radius: 14px; padding: 22px 24px; margin-top: 16px; }
+.crop { display: none; }
+
+/* scenario A / B as real buttons */
+.scen-pick { gap: 12px; }
+.scen-a { border: 1.5px solid var(--rule-2) !important; border-radius: 12px; padding: 16px 20px; background: transparent; transition: background-color 160ms var(--ease), border-color 160ms var(--ease), transform 120ms var(--ease); }
+.scen-a:active { transform: scale(0.98); }
+.scen-a.on { background: var(--accent); border-color: var(--accent) !important; }
+.scen-a.on b, .scen-a.on small, .scen-a.on .mono { color: var(--accent-ink) !important; }
+@media (hover: hover) and (pointer: fine) { .scen-a:not(.on):hover { border-color: var(--accent) !important; } }
+.cost-tier { border: 1.5px solid var(--rule-2) !important; border-radius: 12px; padding: 14px 18px; transition: background-color 160ms var(--ease); }
+.cost-tier.on { background: var(--accent); border-color: var(--accent) !important; }
+.cost-tier.on .cost-q, .cost-tier.on .cost-n, .cost-tier.on .cost-u, .cost-tier.on small { color: var(--accent-ink) !important; }
+.cost-tiers { gap: 12px; }
+.journey-step { min-height: 34vh; }
+.journey-steps { padding: 6vh 0 4vh; }
+.journey-sticky { height: min(72svh, 640px); }
+.log-crypt { overflow: hidden; }
+.log-crypt > div { overflow: visible !important; }
+.log-crypt .log tbody tr td { background: transparent !important; }

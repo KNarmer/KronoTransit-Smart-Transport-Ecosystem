@@ -7,7 +7,7 @@ import PcbHero from '../components/PcbHero.jsx';
 import Journey from '../components/Journey.jsx';
 import Witnesses from '../components/Witnesses.jsx';
 import { Reveal, Kicker } from '../components/Bits.jsx';
-import { Rig, Hang, Peek } from '../components/Rig.jsx';
+import { Rig, Hang, Peek, Bench } from '../components/Rig.jsx';
 import Telemetry from '../components/Telemetry.jsx';
 import Sci from '../components/Sci.jsx';
 
@@ -71,7 +71,6 @@ export default function Overview() {
         <Journey />
       </section>
 
-      <Telemetry className="tl-alt" />
       <section className="wrap section wit-wrap">
         <Reveal className="sec-intro">
           <Kicker>Five witnesses</Kicker>
@@ -84,15 +83,14 @@ export default function Overview() {
       <section className="wrap section">
         <Reveal><Kicker>Same pod, four instruments</Kicker><h2 className="h2">Look at it the way an engineer does.</h2></Reveal>
         <div className="sci-row">
-          <Sci kind="wire" tag="01" label="Structure" />
-          <Sci kind="topo" tag="02" label="Contour survey" />
-          <Sci kind="ascii" tag="03" label="Signal" />
-          <Sci kind="dither" tag="04" label="1-bit scan" />
+          <Sci kind="wire" tag="01" label="Structure" scale={3.6} />
+          <Sci kind="topo" tag="02" label="Contour survey" scale={3.6} />
+          <Sci kind="ascii" tag="03" label="Signal" scale={3.8} />
+          <Sci kind="dither" tag="04" label="1-bit scan" scale={3.6} />
         </div>
       </section>
 
       <section className="wrap section student">
-        <Peek id="bat" side="left" className="rig-student" rot={14} colors={['red', 'black']} />
         <Reveal>
           <p className="student-line">Designed, wired and coded by high school students.</p>
           <div className="hero-links center">
@@ -101,6 +99,7 @@ export default function Overview() {
           </div>
         </Reveal>
       </section>
+      <Bench ids={['lsm6', 'bme', 'pi', 'as7341', 'rtc']} />
     </>
   );
 }

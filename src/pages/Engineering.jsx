@@ -4,8 +4,7 @@ import Prov, { ProvKey } from '../components/Prov.jsx';
 import BusExplorer from '../components/BusExplorer.jsx';
 import CostExplorer from '../components/CostExplorer.jsx';
 import { Reveal, Kicker } from '../components/Bits.jsx';
-import { Hang, Peek, hw } from '../components/Rig.jsx';
-import Telemetry from '../components/Telemetry.jsx';
+import { Hang, Peek, hw, Bench } from '../components/Rig.jsx';
 import Sci from '../components/Sci.jsx';
 
 const RAILS = [
@@ -21,7 +20,7 @@ const DECISIONS = [
 ];
 
 export default function Engineering() {
-  const gallery = COMPONENTS.filter((c) => c.img);
+  const gallery = COMPONENTS.filter((c) => c.img && c.id !== 'dock');
   return (
     <>
       <section className="wrap lead-block lead-split">
@@ -31,9 +30,8 @@ export default function Engineering() {
           <h1 className="h1">Every board, every wire, every dollar.</h1>
           <p className="lede">Off-the-shelf boards today, one custom PCB tomorrow.</p>
         </div>
-        <Sci kind="wire" tag="E" label="Wireframe · drag to rotate" />
+        <Sci kind="wire" tag="E" label="Wireframe · drag to rotate" scale={4} />
       </section>
-      <Telemetry />
 
       <section className="wrap section gallery-wrap">
         <Reveal><Kicker>The parts</Kicker><h2 className="h2">Meet the hardware.</h2></Reveal>
@@ -103,6 +101,7 @@ export default function Engineering() {
         <Reveal><Kicker>Cost</Kicker><h2 className="h2">One pod at 1, 50 and 1,000.</h2></Reveal>
         <CostExplorer />
       </section>
+      <Bench ids={['chg', 'gauge', 'pp2', 'boost', 'bat']} />
     </>
   );
 }

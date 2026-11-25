@@ -4,9 +4,8 @@ import { ease } from '../motion.js';
 import { REPO } from '../routes.js';
 import { Reveal, Kicker } from '../components/Bits.jsx';
 import Prov from '../components/Prov.jsx';
-import { Hang, Peek } from '../components/Rig.jsx';
+import { Hang, Peek, Bench } from '../components/Rig.jsx';
 import Sci from '../components/Sci.jsx';
-import Telemetry from '../components/Telemetry.jsx';
 
 // Add a public contact address here when you have one; until then, visitors are sent to GitHub.
 const CONTACT_EMAIL = '';
@@ -68,9 +67,8 @@ export default function Grants() {
           <h1 className="h1">We’ve got the wiring. <em>Got a power supply?</em></h1>
           <p className="lede">High school students looking for grants, pilot sites and mentors. No funding yet — that’s what this page is for.</p>
         </div>
-        <Sci kind="particles" tag="P" label="Wave your cursor through it" />
+        <Sci kind="particles" tag="P" label="Wave your cursor through it" scale={4} />
       </section>
-      <Telemetry />
 
       <section className="wrap section ports-wrap">
         <Reveal><Kicker>Plug in</Kicker><h2 className="h2">Five ways to connect.</h2></Reveal>
@@ -84,7 +82,7 @@ export default function Grants() {
         <ol>
           {UNLOCKS.map(([v, t, k], i) => (
             <Reveal as="li" key={v} delay={i * 0.06}>
-              <b>{v}</b><span>{t} <Prov k={k} /></span>
+              <b>{v}</b><span>{t}</span>
             </Reveal>
           ))}
         </ol>
@@ -104,6 +102,7 @@ export default function Grants() {
         </div>
         <p className="note">Student-led · high school · open source</p>
       </section>
+      <Bench ids={['h3lis', 'as7341', 'pi', 'nfc']} />
     </>
   );
 }

@@ -5,9 +5,8 @@ import { COMPONENTS } from '../data/components.js';
 import Prov from '../components/Prov.jsx';
 import { Reveal, Kicker } from '../components/Bits.jsx';
 import CrossSection from '../components/CrossSection.jsx';
-import { Hang } from '../components/Rig.jsx';
+import { Hang, Bench } from '../components/Rig.jsx';
 import Sci from '../components/Sci.jsx';
-import Telemetry from '../components/Telemetry.jsx';
 
 const PodViewer = lazy(() => import('../components/PodViewer.jsx'));
 const GROUPS = ['Cartridge well', 'Backbone', 'Base tray', 'Shell', 'KronoDock'];
@@ -100,15 +99,14 @@ export default function PodArch() {
           ))}
         </nav>
       </section>
-
-      <Telemetry />
       <section className="wrap section xs-wrap">
         <Reveal><Kicker>Cross-section</Kicker><h2 className="h2">How the layers stack.</h2></Reveal>
         <div className="xs-grid">
-          <Sci kind="wire" tag="A" label="Wireframe" className="xs-sci" />
+          <Sci kind="wire" tag="A" label="Wireframe" className="xs-sci" scale={3.3} />
           <CrossSection />
         </div>
       </section>
+      <Bench ids={['core', 'nfc', 'boost', 'gauge']} />
     </>
   );
 }

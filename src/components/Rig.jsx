@@ -102,3 +102,21 @@ export const Peek = ({ id, side = 'right', className, w = 420, rot = -12, colors
   });
   return <Rig className={`rig-peek ${side} ${className}`} from={side} viewBox="0 0 500 420" wires={wires} boards={[{ id, x: cx, y: 210, w, rot }]} />;
 };
+
+// A workbench strip: real boards lying side by side, jumpered together. Sits in its own band
+// above the footer, so it never overlaps content.
+export function Bench({ ids, className = '' }) {
+  const n = ids.length;
+  const slot = 1600 / n;
+  const boards = ids.map((id, i) => ({ id, x: slot * (i + 0.5), y: 150 + (i % 2 ? 14 : -10), w: Math.min(300, slot * 0.72), rot: (i % 2 ? 5 : -6) }));
+  const colors = ['red', 'black', 'yellow', 'blue', 'green', 'white', 'orange', 'purple'];
+  const wires = [];
+  for (let i = 0; i < n - 1; i++) {
+    const a = boards[i], b = boards[i + 1];
+    for (let k = 0; k < 3; k++) {
+      const y0 = a.y + 40 + k * 8, y1 = b.y + 40 + k * 8, x0 = a.x + a.w * 0.36, x1 = b.x - b.w * 0.36;
+      wires.push({ from: [x0, y0], c1: [x0 + 50, y0 + 70 + k * 14], c2: [x1 - 50, y1 + 70 + k * 14], to: [x1, y1], color: colors[(i * 3 + k) % colors.length] });
+    }
+  }
+  return <Rig className={`bench ${className}`} viewBox="0 0 1600 300" boards={boards} wires={wires} w={4} />;
+}

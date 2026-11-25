@@ -4,9 +4,8 @@ import { ease } from '../motion.js';
 import { SCENARIOS, BAND } from '../data/scenarios.js';
 import Report from '../components/Report.jsx';
 import { Reveal, Kicker } from '../components/Bits.jsx';
-import { Hang } from '../components/Rig.jsx';
+import { Hang, Bench } from '../components/Rig.jsx';
 import Sci from '../components/Sci.jsx';
-import Telemetry from '../components/Telemetry.jsx';
 
 const fhir = (sc) => JSON.stringify({
   resourceType: 'Observation',
@@ -37,10 +36,8 @@ export default function LabReports() {
           <p className="lede">Verdict first. Then drag the timeline, or try to tamper with the log.</p>
           <p className="flag mono">Illustrative demo data · no clinical validation yet</p>
         </div>
-        <Sci kind="topo" tag="R" label="Contour survey of the pod" />
+        <Sci kind="topo" tag="R" label="Contour survey of the pod" scale={4} />
       </section>
-
-      <Telemetry />
       <section className="wrap scen">
         <div className="scen-pick" role="tablist" aria-label="Scenario">
           {SCENARIOS.map((s) => (
@@ -72,6 +69,7 @@ export default function LabReports() {
           <pre className="code"><code>{fhir(sc)}</code></pre>
         </details>
       </section>
+      <Bench ids={['rtc', 'pi', 'magDock', 'h3lis']} />
     </>
   );
 }

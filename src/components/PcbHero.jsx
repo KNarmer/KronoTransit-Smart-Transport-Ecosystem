@@ -25,7 +25,7 @@ export default function PcbHero() { // now the 'What's inside' circuit section
 
   return (
     <section className="hero circuit">
-      <svg className="pcb" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+      <svg className="pcb" viewBox="-60 -20 1720 1040" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
         <defs>
           <pattern id="vias" width="40" height="40" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r="1.1" className="via" /></pattern>
           <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="14" stdDeviation="12" floodColor="#000" floodOpacity="0.45" /></filter>

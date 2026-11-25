@@ -1,7 +1,6 @@
 // A transport report as a receiving lab would see it. Demonstration data only.
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { BAND } from '../data/scenarios.js';
-import { DecryptReveal } from './canvasui/DecryptReveal.tsx';
 
 const W = 1000, PADL = 54, PADR = 10;
 const ROWS = [
@@ -100,8 +99,8 @@ export default function Report({ sc }) {
           ))}
           {/* time axis */}
           {[0, 0.25, 0.5, 0.75, 1].map((t) => { const i = Math.round(t * (f.length - 1)); return <text key={t} x={x(i)} y={H - 2} className="ax-u" textAnchor={t === 1 ? 'end' : t === 0 ? 'start' : 'middle'}>{fmt(f[i].s)}</text>; })}
-          <g className="legend"><line x1={PADL + 4} x2={PADL + 22} y1={layout[0].y + 6} y2={layout[0].y + 6} className="ln ln-a" /><text x={PADL + 28} y={layout[0].y + 10} className="ax-u">core (vial)</text>
-            <line x1={PADL + 110} x2={PADL + 128} y1={layout[0].y + 6} y2={layout[0].y + 6} className="ln ln-b" /><text x={PADL + 134} y={layout[0].y + 10} className="ax-u">ambient</text></g>
+          <g className="legend"><line x1={W - 250} x2={W - 232} y1={layout[0].y - 8} y2={layout[0].y - 8} className="ln ln-a" /><text x={W - 226} y={layout[0].y - 4} className="ax-u">core (vial)</text>
+            <line x1={W - 140} x2={W - 122} y1={layout[0].y - 8} y2={layout[0].y - 8} className="ln ln-b" /><text x={W - 116} y={layout[0].y - 4} className="ax-u">ambient</text></g>
           {/* scrubber */}
           <line x1={x(idx)} x2={x(idx)} y1="20" y2={H - 14} className="scrub" />
           {layout.map((r) => r.series.map(([k]) => !r.bars && <circle key={r.key + k} cx={x(idx)} cy={yOf(r, Math.max(r.lo, Math.min(r.hi, cur[k])))} r="3.6" className="scrub-dot" />))}
@@ -127,7 +126,6 @@ export default function Report({ sc }) {
           <p className="body">Each line is chained to the last. Change one and every hash after it breaks.</p>
           <button className={`ctl ${tamper ? 'on' : ''}`} onClick={() => setTamper((v) => !v)}>{tamper ? 'Restore original log' : 'Try to edit the impact entry'}</button>
         </div>
-        <DecryptReveal className="log-crypt" radius={190} cell={13} color="#5b9dff" colored={0.4} background="rgba(0,0,0,0)" passthrough={0.08} scramble={0.2} scrambleSpeed={8}>
         <table className="log">
           <thead><tr><th>Time</th><th>Source</th><th>Event</th><th>Chain</th></tr></thead>
           <tbody>
@@ -144,7 +142,6 @@ export default function Report({ sc }) {
             })}
           </tbody>
         </table>
-        </DecryptReveal>
       </section>
     </article>
   );
