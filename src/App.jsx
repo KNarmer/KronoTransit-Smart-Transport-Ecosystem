@@ -1,42 +1,43 @@
-import { lazy, Suspense, useEffect } from 'react';
+import { lazy, Suspense } from 'react';
 import { Route, Routes, useLocation } from 'react-router-dom';
-import { MotionConfig } from 'framer-motion';
+import { AnimatePresence, MotionConfig, motion } from 'framer-motion';
 import { ease } from './motion.js';
-import { TopBar, Footer, NextPage } from './components/Shell.jsx';
+import { TopBar, Footer, RouteScan } from './components/Shell.jsx';
 import Overview from './pages/Overview.jsx';
 
-const Problem = lazy(() => import('./pages/Problem.jsx'));
-const Pod = lazy(() => import('./pages/Pod.jsx'));
-const Record = lazy(() => import('./pages/Record.jsx'));
-const Build = lazy(() => import('./pages/Build.jsx'));
-const Plan = lazy(() => import('./pages/Plan.jsx'));
-
-function ScrollTop() {
-  const { pathname } = useLocation();
-  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
-  return null;
-}
+const PodArch = lazy(() => import('./pages/PodArch.jsx'));
+const LabReports = lazy(() => import('./pages/LabReports.jsx'));
+const Engineering = lazy(() => import('./pages/Engineering.jsx'));
+const Grants = lazy(() => import('./pages/Grants.jsx'));
 
 export default function App() {
+  const location = useLocation();
   return (
     <MotionConfig reducedMotion="user" transition={{ ease }}>
-      <ScrollTop />
       <TopBar />
-      <main className="page">
-        <Suspense fallback={<div className="page-loading" />}>
-          <Routes>
-            <Route path="/" element={<Overview />} />
-            <Route path="/problem" element={<Problem />} />
-            <Route path="/pod" element={<Pod />} />
-            <Route path="/record" element={<Record />} />
-            <Route path="/build" element={<Build />} />
-            <Route path="/plan" element={<Plan />} />
-            <Route path="*" element={<Overview />} />
-          </Routes>
-        </Suspense>
-        <NextPage />
-      </main>
-      <Footer />
+      <RouteScan />
+      <AnimatePresence mode="wait" initial={false} onExitComplete={() => window.scrollTo(0, 0)}>
+        <motion.main
+          key={location.pathname}
+          className="page"
+          initial={{ opacity: 0, clipPath: 'inset(0 0 100% 0)' }}
+          animate={{ opacity: 1, clipPath: 'inset(0 0 0% 0)', transition: { duration: 0.55, ease, delay: 0.12 } }}
+          exit={{ opacity: 0, transition: { duration: 0.18, ease } }}
+          onAnimationComplete={(def) => { if (def?.clipPath) document.querySelector('.page')?.style.removeProperty('clip-path'); }}
+        >
+          <Suspense fallback={<div className="page-wait" />}>
+            <Routes location={location}>
+              <Route path="/" element={<Overview />} />
+              <Route path="/pod" element={<PodArch />} />
+              <Route path="/lab-reports" element={<LabReports />} />
+              <Route path="/engineering" element={<Engineering />} />
+              <Route path="/grants" element={<Grants />} />
+              <Route path="*" element={<Overview />} />
+            </Routes>
+          </Suspense>
+          <Footer />
+        </motion.main>
+      </AnimatePresence>
     </MotionConfig>
   );
 }

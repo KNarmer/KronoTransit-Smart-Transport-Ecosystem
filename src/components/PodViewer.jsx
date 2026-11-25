@@ -1,6 +1,7 @@
-// The real Kit B model (every board, wire and printed part from the bench-build app), pulled apart.
-// Rendering notes: full device pixel ratio, anisotropic texture filtering, logarithmic depth (no z-fighting
-// flicker on coplanar labels and pads), no fog, and shadow biasing so faces don't shimmer as the view turns.
+// Pod Architecture viewer. The model is exported assembled; each part carries its explode offset (mm).
+// - explode: 0 = assembled, 1 = pulled apart (animated), with the harness swapped to match
+// - select(component): camera eases to frame it, everything else ghosts to ~18% so it's visible
+// - reset(): clears selection and returns to the home view
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -9,165 +10,225 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
 import { POD_GLB, DRACO } from './model.js';
 
-const HILITE = new THREE.Color('#d4ff3a');
+const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
-export default function PodViewer({ selected = null, onHover, onParts, onReady, autoRotate = true, controlsRef }) {
+export default function PodViewer({ onReady, onPick, onHover, apiRef, theme = 'dark' }) {
   const wrapRef = useRef(null);
-  const api = useRef({});
+  const themeRef = useRef(theme);
+  themeRef.current = theme;
 
   useEffect(() => {
     const wrap = wrapRef.current;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, logarithmicDepthBuffer: true, powerPreference: 'high-performance' });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.15;
+    renderer.toneMappingExposure = 1.1;
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     wrap.appendChild(renderer.domElement);
-    const maxAniso = renderer.capabilities.getMaxAnisotropy();
+    const aniso = renderer.capabilities.getMaxAnisotropy();
 
     const scene = new THREE.Scene();
     const pmrem = new THREE.PMREMGenerator(renderer);
     scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-    scene.environmentIntensity = 0.75;
-
-    const camera = new THREE.PerspectiveCamera(26, 1, 0.5, 200);
-
-    scene.add(new THREE.HemisphereLight(0xc8d6e4, 0x0a0c10, 0.35));
-    const key = new THREE.DirectionalLight(0xfff1e2, 3.4);
-    key.position.set(-5, 9, 6);
-    key.castShadow = true;
+    scene.environmentIntensity = 0.8;
+    const camera = new THREE.PerspectiveCamera(30, 1, 0.3, 300);
+    scene.add(new THREE.HemisphereLight(0xdfe8f5, 0x10141c, 0.45));
+    const key = new THREE.DirectionalLight(0xfff2e4, 3.0);
+    key.position.set(-6, 10, 7); key.castShadow = true;
     key.shadow.mapSize.set(4096, 4096);
-    Object.assign(key.shadow.camera, { left: -6, right: 6, top: 6, bottom: -6, near: 1, far: 40 });
-    key.shadow.bias = -0.0002;
-    key.shadow.normalBias = 0.025;
+    Object.assign(key.shadow.camera, { left: -8, right: 8, top: 8, bottom: -8, near: 1, far: 50 });
+    key.shadow.bias = -0.0002; key.shadow.normalBias = 0.03;
     scene.add(key);
-    const rim = new THREE.DirectionalLight(0x5aa8ff, 3.2);
-    rim.position.set(6, 4, -7);
-    scene.add(rim);
-
-    const floor = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), new THREE.ShadowMaterial({ opacity: 0.45 }));
-    floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true;
-    scene.add(floor);
+    const rim = new THREE.DirectionalLight(0x6aa8ff, 2.4); rim.position.set(7, 5, -8); scene.add(rim);
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(80, 80), new THREE.ShadowMaterial({ opacity: 0.3 }));
+    floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; scene.add(floor);
 
     const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true; controls.dampingFactor = 0.08;
-    controls.enablePan = false; controls.enableZoom = false;
-    controls.minPolarAngle = 0.75; controls.maxPolarAngle = 1.38;
-    controls.rotateSpeed = 0.55;
-    controls.autoRotate = autoRotate && !reduce; controls.autoRotateSpeed = 0.4;
-    controls.addEventListener('start', () => { controls.autoRotate = false; });
+    controls.enableDamping = true; controls.dampingFactor = 0.1;
+    controls.enablePan = false;
+    controls.enableZoom = true; controls.zoomSpeed = 0.6;
+    controls.minPolarAngle = 0.25; controls.maxPolarAngle = 1.45;
 
-    const byLabel = new Map();
-    let model = null, disposed = false, home = null;
+    const parts = []; // { node, label, base: Vector3, off: Vector3, meshes: Mesh[] }
+    let wiresA = null, wiresE = null, model = null, unit = 1, home = null, disposed = false;
+    let explode = 0, explodeTo = 0, selected = null, hovered = null;
+    let cam = null; // camera tween
+
+    const allMeshes = [];
+    const setGhost = (mesh, ghost) => {
+      const m = mesh.material;
+      if (ghost) {
+        if (!m.userData.ghost) { m.userData.ghost = { t: m.transparent, o: m.opacity, d: m.depthWrite }; }
+        m.transparent = true; m.opacity = mesh.userData.wire ? 0.05 : 0.15; m.depthWrite = false;
+      } else if (m.userData.ghost) {
+        const g = m.userData.ghost; m.transparent = g.t; m.opacity = g.o; m.depthWrite = g.d; delete m.userData.ghost;
+      }
+      m.needsUpdate = true;
+    };
+    const tint = (mesh, on) => {
+      const m = mesh.material; if (!m.emissive) return;
+      if (!m.userData.e0) m.userData.e0 = m.emissive.clone();
+      if (on) { m.emissive.set(on); m.emissiveIntensity = 0.5; } else { m.emissive.copy(m.userData.e0); m.emissiveIntensity = 1; }
+    };
+    const paint = () => {
+      const sel = new Set(selected ? selected.meshes : []);
+      const hov = new Set(hovered ? hovered.meshes : []);
+      for (const m of allMeshes) {
+        setGhost(m, !!selected && !sel.has(m));
+        tint(m, sel.has(m) ? '#3d7dff' : hov.has(m) ? '#5aa8ff' : null);
+      }
+      if (wiresA) wiresA.traverse((o) => o.isMesh && setGhost(o, !!selected));
+      if (wiresE) wiresE.traverse((o) => o.isMesh && setGhost(o, !!selected));
+    };
+
+    const frame = (meshes, dur = 1.1) => {
+      const box = new THREE.Box3();
+      meshes.forEach((m) => box.expandByObject(m));
+      const c = box.getCenter(new THREE.Vector3());
+      const r = Math.max(box.getSize(new THREE.Vector3()).length() / 2, 0.25);
+      const dir = camera.position.clone().sub(controls.target).normalize();
+      const dist = Math.max(r / Math.sin(THREE.MathUtils.degToRad(camera.fov / 2)) * 3, 4.4);
+      // Shift the view so the part sits left of centre, clear of the info panel on the right.
+      const fwd = dir.clone().negate();
+      const right = new THREE.Vector3().crossVectors(fwd, camera.up).normalize();
+      const shift = right.multiplyScalar(wrap.clientWidth > 900 ? dist * 0.22 : 0);
+      const t1 = c.clone().add(shift);
+      cam = { t: 0, dur, p0: camera.position.clone(), t0: controls.target.clone(), p1: c.clone().addScaledVector(dir, dist).add(shift), t1 };
+    };
 
     const draco = new DRACOLoader().setDecoderPath(DRACO);
     new GLTFLoader().setDRACOLoader(draco).load(POD_GLB, (gltf) => {
       if (disposed) return;
       model = gltf.scene;
-      model.traverse((o) => { if (o.parent === model) o.rotation.set(0, -0.5, 0); });
+      model.rotation.y = -0.45;
       model.updateMatrixWorld(true);
+      // Scale on the exploded footprint so both states fit.
       const box = new THREE.Box3().setFromObject(model);
       const size = box.getSize(new THREE.Vector3());
-      model.scale.setScalar(5.6 / Math.max(size.x, size.z));
+      // Leave room for the exploded layout: the shell steps 260 mm to the left.
+      unit = 6.2 / Math.max(size.x + 260, size.z);
+      model.scale.setScalar(unit);
       box.setFromObject(model);
       const c = box.getCenter(new THREE.Vector3());
-      model.position.set(-c.x, -box.min.y, -c.z);
+      model.position.set(-c.x + 120 * unit, -box.min.y, -c.z);
       scene.add(model);
 
       model.traverse((o) => {
+        const raw = o.userData?.name || '';
+        if (raw === 'wires:assembled') wiresA = o;
+        if (raw === 'wires:exploded') wiresE = o;
+      });
+      model.traverse((o) => {
         if (o.isMesh) {
           o.castShadow = true; o.receiveShadow = true;
-          const m = o.material = o.material.clone();
-          for (const k of ['map', 'normalMap', 'roughnessMap', 'metalnessMap', 'emissiveMap']) if (m[k]) m[k].anisotropy = maxAniso;
-          // Decals and silkscreen sit a hair above their board: push them forward so they never flicker.
-          if (m.transparent || m.alphaTest > 0) { m.polygonOffset = true; m.polygonOffsetFactor = -2; m.polygonOffsetUnits = -2; }
+          o.material = o.material.clone();
+          for (const k of ['map', 'normalMap', 'roughnessMap', 'metalnessMap', 'emissiveMap']) if (o.material[k]) o.material[k].anisotropy = aniso;
+          if (o.material.transparent || o.material.alphaTest > 0) { o.material.polygonOffset = true; o.material.polygonOffsetFactor = -2; o.material.polygonOffsetUnits = -2; }
         }
         const raw = o.userData?.name || '';
         if (raw.startsWith('part:')) {
-          const name = raw.slice(5);
-          const label = /^[a-z0-9_]+$/.test(name) ? 'Wire' : name;
-          const mats = [];
-          o.traverse((m) => { if (m.isMesh) mats.push(m.material); });
-          mats.forEach((m) => { m.userData.baseEmissive = m.emissive ? m.emissive.clone() : null; });
-          o.userData.label = label; o.userData.mats = mats;
-          if (!byLabel.has(label)) byLabel.set(label, []);
-          byLabel.get(label).push(o);
+          const label = raw.slice(5);
+          // Unlabelled ids are copies of wiring that the harness snapshots replace.
+          if (/^[a-z0-9_]+$/.test(label)) { o.visible = false; return; }
+          const meshes = []; o.traverse((m) => m.isMesh && meshes.push(m));
+          const off = o.userData.off || [0, 0, 0];
+          parts.push({ node: o, label, base: o.position.clone(), off: new THREE.Vector3(...off), meshes });
+          meshes.forEach((m) => { m.userData.part = parts[parts.length - 1]; allMeshes.push(m); });
         }
       });
+      if (wiresE) wiresE.visible = false;
+      [wiresA, wiresE].forEach((w) => w && w.traverse((o) => { if (o.isMesh) o.userData.wire = true; }));
 
-      const bb = new THREE.Box3().setFromObject(model);
-      const h = bb.max.y - bb.min.y;
-      controls.target.set(0, h * 0.42, 0);
-      camera.position.set(0.5, h * 0.62 + 2.2, 13.5);
+      controls.target.set(0, (box.max.y - box.min.y) * 0.3, 0);
+      camera.position.set(4.5, 4.2, 10.5);
       controls.update();
-      home = { pos: camera.position.clone(), target: controls.target.clone() };
-      onParts?.([...byLabel.keys()].filter((l) => l !== 'Wire'));
-      onReady?.();
+      home = { p: camera.position.clone(), t: controls.target.clone() };
+      onReady?.(parts.map((p) => p.label));
     });
 
-    // Highlighting: hover (transient) and selection (sticky) share one tint routine.
-    let hovered = null, sticky = null;
-    const tint = (label, on, k = 0.28) => {
-      (byLabel.get(label) || []).forEach((o) => o.userData.mats.forEach((m) => {
-        if (!m.emissive) return;
-        if (on) { m.emissive.copy(HILITE); m.emissiveIntensity = k; }
-        else { m.emissive.copy(m.userData.baseEmissive); m.emissiveIntensity = 1; }
-      }));
+    const api = {
+      setExplode: (v) => { explodeTo = v; },
+      select: (match, labelForHud) => {
+        if (!match) { selected = null; paint(); return; }
+        const re = match instanceof RegExp ? match : new RegExp(`^${match.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}$`);
+        const hit = parts.filter((p) => re.test(p.label));
+        if (!hit.length) return;
+        const meshes = hit.flatMap((p) => p.meshes);
+        selected = { meshes, label: labelForHud };
+        paint();
+        frame(meshes);
+      },
+      reset: () => {
+        selected = null; paint();
+        if (home) cam = { t: 0, dur: 1, p0: camera.position.clone(), t0: controls.target.clone(), p1: home.p.clone(), t1: home.t.clone() };
+      },
     };
-    const refresh = () => {
-      for (const l of byLabel.keys()) tint(l, false);
-      if (sticky) tint(sticky, true, 0.35);
-      if (hovered && hovered !== sticky) tint(hovered, true, 0.22);
-    };
-    api.current.select = (label) => { sticky = label; refresh(); };
-    api.current.reset = () => {
-      if (!home) return;
-      camera.position.copy(home.pos); controls.target.copy(home.target); controls.update();
-    };
-    if (controlsRef) controlsRef.current = api.current;
+    if (apiRef) apiRef.current = api;
 
+    // Pointer: hover highlights a part, click selects it.
     const ray = new THREE.Raycaster();
     const ptr = new THREE.Vector2();
-    let pending = false, inside = false;
-    const labelOf = (o) => { while (o && !o.userData.label) o = o.parent; return o?.userData.label || null; };
-    const onMove = (e) => {
+    let pending = false, down = null;
+    const pick = (e) => {
       const r = renderer.domElement.getBoundingClientRect();
       ptr.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
-      inside = true; pending = true;
+      ray.setFromCamera(ptr, camera);
+      const hits = ray.intersectObjects(allMeshes, false).filter((h) => h.object.visible && !(h.object.material.userData.ghost));
+      return hits[0]?.object.userData.part || null;
     };
-    const onLeave = () => { inside = false; if (hovered) { hovered = null; refresh(); onHover?.(null); } };
-    renderer.domElement.addEventListener('pointermove', onMove);
-    renderer.domElement.addEventListener('pointerleave', onLeave);
+    const onMove = (e) => { ptr.ex = e; pending = true; };
+    const onDown = (e) => { down = [e.clientX, e.clientY]; };
+    const onUp = (e) => {
+      if (!down || Math.hypot(e.clientX - down[0], e.clientY - down[1]) > 5) return;
+      const p = pick(e);
+      onPick?.(p ? p.label : null);
+    };
+    const onLeave = () => { if (hovered) { hovered = null; paint(); onHover?.(null); } };
+    const el = renderer.domElement;
+    el.addEventListener('pointermove', onMove);
+    el.addEventListener('pointerdown', onDown);
+    el.addEventListener('pointerup', onUp);
+    el.addEventListener('pointerleave', onLeave);
 
     const resize = () => {
-      const w = wrap.clientWidth, h = wrap.clientHeight;
-      if (!w || !h) return;
-      renderer.setSize(w, h, false);
-      renderer.domElement.style.width = '100%'; renderer.domElement.style.height = '100%';
-      camera.aspect = w / h;
-      camera.fov = w / h < 1 ? 38 : 26;
-      camera.updateProjectionMatrix();
+      const w = wrap.clientWidth, h = wrap.clientHeight; if (!w || !h) return;
+      renderer.setSize(w, h, false); el.style.width = '100%'; el.style.height = '100%';
+      camera.aspect = w / h; camera.fov = w / h < 1 ? 42 : 30; camera.updateProjectionMatrix();
     };
     const ro = new ResizeObserver(resize); ro.observe(wrap); resize();
 
-    let visible = true, raf = 0;
-    const io = new IntersectionObserver(([en]) => { visible = en.isIntersecting; if (visible && !raf) raf = requestAnimationFrame(tick); });
+    let raf = 0, visible = true, last = performance.now();
+    const io = new IntersectionObserver(([en]) => { visible = en.isIntersecting; if (visible && !raf) { last = performance.now(); raf = requestAnimationFrame(tick); } });
     io.observe(wrap);
 
-    function tick() {
-      raf = 0;
-      if (disposed || !visible) return;
+    function tick(now) {
+      raf = 0; if (disposed || !visible) return;
+      const dt = Math.min(0.12, (now - last) / 1000); last = now;
+      // Explode easing (critically damped: no overshoot).
+      if (explode !== explodeTo) {
+        const step = reduce ? 1 : dt / 0.9;
+        explode = explodeTo > explode ? Math.min(explodeTo, explode + step) : Math.max(explodeTo, explode - step);
+        const k = ease(explode);
+        for (const p of parts) p.node.position.copy(p.base).addScaledVector(p.off, k);
+        if (wiresA) wiresA.visible = k < 0.5;
+        if (wiresE) wiresE.visible = k >= 0.5;
+        if (explode === explodeTo && selected) frame(selected.meshes, 0.8);
+      }
+      if (cam) {
+        cam.t = Math.min(1, cam.t + (reduce ? 1 : dt / cam.dur));
+        const k = ease(cam.t);
+        camera.position.lerpVectors(cam.p0, cam.p1, k);
+        controls.target.lerpVectors(cam.t0, cam.t1, k);
+        if (cam.t >= 1) cam = null;
+      }
       controls.update();
-      if (pending && model && inside) {
+      if (pending && model && ptr.ex) {
         pending = false;
-        ray.setFromCamera(ptr, camera);
-        const hit = ray.intersectObject(model, true)[0];
-        const l = hit ? labelOf(hit.object) : null;
-        if (l !== hovered) { hovered = l; refresh(); onHover?.(l); renderer.domElement.style.cursor = l ? 'grab' : ''; }
+        const p = pick(ptr.ex);
+        if (p !== hovered) { hovered = p; paint(); onHover?.(p ? p.label : null); el.style.cursor = p ? 'pointer' : ''; }
       }
       renderer.render(scene, camera);
       raf = requestAnimationFrame(tick);
@@ -175,23 +236,19 @@ export default function PodViewer({ selected = null, onHover, onParts, onReady, 
     raf = requestAnimationFrame(tick);
 
     return () => {
-      disposed = true;
-      cancelAnimationFrame(raf);
-      io.disconnect(); ro.disconnect();
-      renderer.domElement.removeEventListener('pointermove', onMove);
-      renderer.domElement.removeEventListener('pointerleave', onLeave);
+      disposed = true; cancelAnimationFrame(raf); io.disconnect(); ro.disconnect();
+      el.removeEventListener('pointermove', onMove); el.removeEventListener('pointerdown', onDown);
+      el.removeEventListener('pointerup', onUp); el.removeEventListener('pointerleave', onLeave);
       controls.dispose(); draco.dispose(); pmrem.dispose();
       scene.traverse((o) => {
         if (o.geometry) o.geometry.dispose();
-        if (o.material) (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) => { m.map?.dispose(); m.dispose(); });
+        if (o.material) (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) => { for (const k in m) if (m[k]?.isTexture) m[k].dispose(); m.dispose(); });
       });
-      renderer.dispose();
-      wrap.removeChild(renderer.domElement);
+      renderer.dispose(); renderer.forceContextLoss();
+      wrap.removeChild(el);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useEffect(() => { api.current.select?.(selected); }, [selected]);
 
   return <div className="viewer" ref={wrapRef} />;
 }

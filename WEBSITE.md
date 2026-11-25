@@ -1,30 +1,36 @@
 # KronoTransit website
 
-React 19 + Vite + Framer Motion, with [Canvas UI](https://canvasui.dev) effects rendering the real Kit B pod model.
+React 19 + Vite + Framer Motion + three.js, hash-routed for GitHub Pages. Five pages:
+
+| Route | Page | Main pieces |
+|---|---|---|
+| `#/` | Overview | `PcbHero` (board renders joined by routed traces), `Journey` (five-stage scroll story), `Witnesses` (live five-sensor simulator) |
+| `#/pod` | Pod Architecture | `PodViewer` (assemble/explode, click-to-frame, ghosting, HUD), `CrossSection` (to-scale section drawing) |
+| `#/lab-reports` | Lab Reports | `Report` (triage banner, scrubbable multi-axis timeline, SHA-256 audit chain), FHIR example |
+| `#/engineering` | Engineering & BOM | Component register, `BusExplorer` (EDA-style schematic), power rails, `CostExplorer` (1× / 50× / 1,000×) |
+| `#/grants` | Grants & Team | Outreach "ports", funding steps, founder profiles |
 
 ```bash
 npm install
-npm run dev      # local dev server
-npm run build    # static output in dist/
+npm run dev
+npm run build   # static output in dist/, deployed by .github/workflows/deploy.yml
 ```
 
-`dist/` is plain static files with relative paths, so it can go on GitHub Pages, Vercel or Netlify.
+## Data and provenance
 
-## Where things live
+All technical numbers live in `src/data/`:
 
-- `src/components/`: page sections
-- `src/components/canvasui/`: [Canvas UI](https://canvasui.dev) components, installed from its shadcn registry
-  - `ParticleObject` (hero), `WireframeObject` (inside the pod), `DecryptReveal` (trip log)
-  - `DecryptReveal` needs Chrome 157+ (html-in-canvas); other browsers show the plain log
-- `public/models/kronotransit-pod.glb`: the Kit B pod from the bench-build app (99 parts, every wire), exploded, Draco-compressed (~950 KB). Hero = ParticleObject, "Inside the pod" = WireframeObject.
-  - Made by `tools/export-from-bench-build.cjs`: serve the unzipped bench-build app (with its three import map pointed at a local three@0.160) on :8765, run the script with Playwright, then `gltf-transform optimize <in> <out> --compress draco --texture-compress webp --texture-size 256`.
-- `public/draco/`: self-hosted Draco decoder for the model.
-- `src/motion.js`: easing tokens
+- `components.js` — component register; every value is tagged `ds` (datasheet), `est` (design estimate), `quote` (supplier list price), `lit` (published study) or `bench` (measured; none yet).
+- `bom.js` — prototype line items at list prices (total $502.71) and the modelled 50× and 1,000× tiers with written assumptions.
+- `scenarios.js` — the illustrative Lab Report scenarios. Generated, not measured.
 
-## Motion rules (after Emil Kowalski's skills)
+When bench measurements exist, add them with the `bench` tag and replace the matching estimates.
 
-- Ease-out `cubic-bezier(0.23, 1, 0.32, 1)` for entrances; no ease-in on UI.
-- One hero entrance. No scroll reveals, marquees, count-ups or hover lifts. What moves: the Canvas UI models (cursor-driven), the score ring, and the sensor-tab crossfade.
-- Press feedback `scale(0.97)` at 160ms; hover effects gated by `(hover: hover) and (pointer: fine)`.
-- Exits are faster than entrances. Numbers animate through motion values, not React state.
-- `prefers-reduced-motion` is respected through `MotionConfig reducedMotion="user"`.
+## Founders
+
+Fill in `FOUNDERS` in `src/pages/Grants.jsx` (role, bio, photo path under `public/`). Set `CONTACT_EMAIL` there to show an email link instead of GitHub issues.
+
+## Assets
+
+- `public/models/kronotransit-pod.glb` — the prototype exported assembled from the bench-build model, with per-part explode offsets in node extras and two wiring-harness states. Draco-compressed; decoder in `public/draco/`.
+- `public/hw/*.webp` — board renders made from the same model.
