@@ -4,6 +4,7 @@ import { ease } from '../motion.js';
 import { REPO } from '../routes.js';
 import { Reveal, Kicker } from '../components/Bits.jsx';
 import Prov from '../components/Prov.jsx';
+import { Hang, Peek } from '../components/Rig.jsx';
 
 // Add a public contact address here when you have one; until then, visitors are sent to GitHub.
 const CONTACT_EMAIL = '';
@@ -59,9 +60,11 @@ export default function Grants() {
   return (
     <>
       <section className="wrap lead-block grants-hero">
+        <Hang id="magDock" className="rig-lead" colors={['red', 'black', 'white', 'green', 'yellow']} w={280} rot={6} />
+        <Hang id="gauge" className="rig-lead2" colors={['orange', 'purple']} len={240} w={180} rot={-12} />
         <Kicker>Grants & Team</Kicker>
-        <h1 className="h1">We have the wiring. <em>We’re looking for the power supply.</em></h1>
-        <p className="lede">KronoTransit is built by high school students who think specimen transport deserves better evidence. We’re actively looking for grants, funding and collaborators to take it from the bench to a real hospital corridor. We have no funding, partnerships or awards yet, which is exactly why this page exists.</p>
+        <h1 className="h1">We’ve got the wiring. <em>Got a power supply?</em></h1>
+        <p className="lede">We’re high school students looking for grants, pilot sites and mentors. No funding yet — that’s what this page is for.</p>
       </section>
 
       <section className="wrap section">
@@ -72,6 +75,7 @@ export default function Grants() {
       </section>
 
       <section className="wrap section unlocks">
+        <Peek id="chg" side="right" className="rig-unlock" colors={['red', 'black']} />
         <Reveal><Kicker>What funding unlocks</Kicker><h2 className="h2">Small numbers, large steps.</h2></Reveal>
         <ol>
           {UNLOCKS.map(([v, t, k], i) => (

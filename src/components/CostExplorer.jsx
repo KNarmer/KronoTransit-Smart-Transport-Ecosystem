@@ -31,7 +31,6 @@ export default function CostExplorer() {
             <p className="cost-big">{usd(total)}<small> per unit</small> <Prov k={t.prov} /></p>
             <p className="cost-tot">{t.qty.toLocaleString()} units → {usd(total * t.qty, 0)} total</p>
           </div>
-          <p className="cost-blurb">{t.blurb}</p>
         </div>
 
         <svg className="cost-bar" viewBox="0 0 1000 46" preserveAspectRatio="none" aria-hidden="true">
@@ -58,9 +57,12 @@ export default function CostExplorer() {
           </tbody>
         </table>
 
-        <ul className="cost-notes">
-          {t.notes.map(([k, n]) => <li key={n}><Prov k={k} /> {n}</li>)}
-        </ul>
+        <details className="more">
+          <summary>Assumptions behind this number</summary>
+          <ul className="cost-notes">
+            {t.notes.map(([k, n]) => <li key={n}><Prov k={k} /> {n}</li>)}
+          </ul>
+        </details>
 
         {t.id === 'proto' && (
           <>

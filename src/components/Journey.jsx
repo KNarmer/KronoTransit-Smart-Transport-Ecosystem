@@ -5,11 +5,11 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ease } from '../motion.js';
 
 const STEPS = [
-  ['Load', 'The sample goes into a Verity cartridge. As it clicks into the cradle, a magnet closes the seat switch and the NFC reader reads the cartridge’s ID. The log opens with that ID as its first line.'],
-  ['Transport', 'Courier van, pneumatic tube, hallway, elevator. Two accelerometers record every bump, from gentle handling to a ±400 g slam; the insulated well and cold packs hold temperature without power.'],
-  ['Monitor', 'Every few seconds the pod reads core and ambient temperature, gas, humidity, pressure and the indicator colour. Impacts wake it instantly. Nothing needs a network.'],
-  ['Edge AI', 'An on-board model weighs the witnesses together: warmth alone, or a bump alone, means little; warmth with gas and colour drift means a lot. It keeps a running quality score and lights green, amber or red.'],
-  ['Report', 'On the dock, the pod hands over its signed log. The dock checks every signature, and the lab receives a report with the verdict, the timeline and every deviation, before anyone runs a test.'],
+  ['Load', 'Click the vial in. The pod reads its tag and starts the diary.'],
+  ['Transport', 'Vans, tubes, potholes. Every bump gets written down.'],
+  ['Monitor', 'Temperature, air, light and motion, every few seconds. No Wi-Fi needed.'],
+  ['Edge AI', 'An on-board model weighs it all and lights green, amber or red.'],
+  ['Report', 'Dock it. The lab gets a signed report before opening the box.'],
 ];
 
 function Stage({ i }) {

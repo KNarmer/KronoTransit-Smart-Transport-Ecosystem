@@ -1,11 +1,7 @@
 // Home hero: the prototype's real boards laid out as one circuit, joined to the processor by routed copper.
 // Hover (or focus) a board to trace its connections; data pulses run along every live trace.
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { motion } from 'framer-motion';
-import { ease } from '../motion.js';
 import { chamfer } from './BusExplorer.jsx';
-import { TAGLINE } from '../routes.js';
 
 const base = import.meta.env.BASE_URL;
 const ASPECT = { as7341: 0.832, bat: 0.729, bme: 0.832, chg: 0.842, core: 0.894, dk: 0.629, gauge: 0.97, h3lis: 0.838, lsm6: 0.721, nfc: 0.803, pi: 0.651 };
@@ -23,12 +19,12 @@ const BOARDS = [
   ['gauge', 'MAX17048', 'Battery fuel gauge', 590, 900, 140, [[590, 830], [590, 780], [900, 780], [900, 640]], 2, 'power'],
 ];
 
-export default function PcbHero() {
+export default function PcbHero() { // now the 'What's inside' circuit section
   const [on, setOn] = useState(null);
   const active = BOARDS.find((b) => b[0] === on);
 
   return (
-    <section className="hero">
+    <section className="hero circuit">
       <svg className="pcb" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
         <defs>
           <pattern id="vias" width="40" height="40" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r="1.1" className="via" /></pattern>
@@ -73,20 +69,9 @@ export default function PcbHero() {
       )}
 
       <div className="hero-copy">
-        <motion.p className="hero-k mono" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, ease }}>
-          Student-led biomedical engineering
-        </motion.p>
-        <motion.h1 className="display" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease, delay: 0.05 }}>
-          {TAGLINE.replace('.', '')}<span className="dot">.</span>
-        </motion.h1>
-        <motion.p className="hero-lede" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease, delay: 0.15 }}>
-          KronoTransit is a sealed carrier for blood and tissue samples. Five independent sensors watch the specimen on its way to the lab, an on-board model judges what they see, and the whole journey is signed so the lab can trust the record.
-        </motion.p>
-        <motion.div className="hero-links" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, ease, delay: 0.3 }}>
-          <Link to="/pod" className="go go-strong">Explore the architecture <span>→</span></Link>
-          <Link to="/lab-reports" className="go">Read a lab report <span>→</span></Link>
-        </motion.div>
-        <p className="hero-hint mono">Hover a board to trace it</p>
+        <p className="hero-k mono">What’s inside</p>
+        <h2 className="h1">Nine boards. One brain.</h2>
+        <p className="hero-lede">Every board here is real and on the parts list. Hover one to light up its wiring.</p>
       </div>
     </section>
   );

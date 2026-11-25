@@ -5,6 +5,7 @@ import { COMPONENTS } from '../data/components.js';
 import Prov from '../components/Prov.jsx';
 import { Reveal, Kicker } from '../components/Bits.jsx';
 import CrossSection from '../components/CrossSection.jsx';
+import { Hang, Peek } from '../components/Rig.jsx';
 
 const PodViewer = lazy(() => import('../components/PodViewer.jsx'));
 const GROUPS = ['Cartridge well', 'Backbone', 'Base tray', 'Shell', 'KronoDock'];
@@ -38,9 +39,10 @@ export default function PodArch() {
   return (
     <>
       <section className="wrap lead-block">
+        <Hang id="nfc" className="rig-lead" colors={['blue', 'white', 'black', 'red', 'yellow']} />
         <Kicker>Pod Architecture</Kicker>
-        <h1 className="h1">Seventeen subsystems in a box the size of a lunch tin.</h1>
-        <p className="lede">This is the alpha prototype exactly as it is wired: every breakout board, probe, printed part and wire, at true scale. Pick a component to fly to it; everything around it turns to glass so you can see where it sits.</p>
+        <h1 className="h1">Seventeen subsystems in a lunch-tin-sized box.</h1>
+        <p className="lede">Pick a part. The camera flies to it and everything else turns to glass.</p>
       </section>
 
       <section className="explore">
@@ -100,13 +102,13 @@ export default function PodArch() {
         </nav>
       </section>
 
-      <section className="wrap section">
+      <section className="wrap section xs-wrap">
+        <Peek id="pp2" side="right" className="rig-xs" colors={['red', 'blue', 'yellow']} />
         <Reveal><Kicker>Cross-section</Kicker><h2 className="h2">How the layers stack.</h2></Reveal>
         <div className="xs-grid">
           <Reveal className="xs-copy">
-            <p className="body">The specimen sits at the centre of everything. Around it: a cradle on four Sorbothane feet, four layers of extruded polystyrene, two cold packs, then the printed shell. Below a mid deck, the electronics live apart from the cold, so the battery and processor stay warm and the sample stays cool.</p>
-            <p className="body">Sensors sit on the cradle’s faces where they can see, smell and feel the vial: the colour sensor at the optical window, the gas sensor at the vent, both accelerometers on the cradle wall, the NFC reader on the side, and the core temperature probe clipped to the glass.</p>
-            <p className="note">There is no active heating or cooling. An earlier design used a Peltier element; at roughly 50 W it would have emptied the battery in minutes, so the pod relies on insulation and cold packs and spends its energy on measuring. <Prov k="est" /></p>
+            <p className="body">The sample sits in the middle, wrapped in foam and cold packs. The electronics live underneath, away from the cold.</p>
+            <p className="note">No heater or cooler: an earlier Peltier design would have drained the battery in minutes. <Prov k="est" /></p>
           </Reveal>
           <CrossSection />
         </div>

@@ -4,6 +4,7 @@ import { ease } from '../motion.js';
 import { SCENARIOS, BAND } from '../data/scenarios.js';
 import Report from '../components/Report.jsx';
 import { Reveal, Kicker } from '../components/Bits.jsx';
+import { Hang, Peek } from '../components/Rig.jsx';
 
 const fhir = (sc) => JSON.stringify({
   resourceType: 'Observation',
@@ -27,10 +28,12 @@ export default function LabReports() {
   return (
     <>
       <section className="wrap lead-block">
+        <Hang id="as7341" className="rig-lead" colors={['green', 'white', 'red', 'black']} rot={-8} />
+        <Hang id="rtc" className="rig-lead2" colors={['yellow', 'black', 'blue']} len={220} w={200} rot={9} />
         <Kicker>Lab Reports</Kicker>
-        <h1 className="h1">What the lab receives when the pod docks.</h1>
-        <p className="lede">A transport report is written for the person who has to decide whether to run the test. It leads with a verdict, then shows the evidence: every reading on one timeline, every deviation with its time, and a chain of custody that can’t be quietly edited.</p>
-        <p className="flag mono">[Illustrative demonstration data] These reports are generated from simple models to show format and content. They are not bench measurements, and the system has no clinical validation yet. Real bench logs will be published here as they are recorded.</p>
+        <h1 className="h1">What the lab sees when the pod docks.</h1>
+        <p className="lede">A verdict first, then the evidence. Drag across the timeline, or try to tamper with the log.</p>
+        <p className="flag mono">Illustrative demo data · not bench measurements · no clinical validation yet</p>
       </section>
 
       <section className="wrap scen">
@@ -50,21 +53,20 @@ export default function LabReports() {
         </AnimatePresence>
       </section>
 
-      <section className="wrap section rep-notes">
-        <Reveal className="rep-col">
-          <Kicker>How to read it</Kicker>
+      <section className="wrap section rep-more">
+        <Peek id="pi" side="left" className="rig-rep" rot={10} colors={['red', 'black', 'green']} />
+        <details className="more">
+          <summary>How to read this report</summary>
           <dl className="defs">
-            <div><dt>Viability status</dt><dd>Set by rules the receiving lab chooses. In this demo: never outside the band → VERIFIED; up to 10 minutes outside → WARNING; longer → EXCURSION.</dd></div>
-            <div><dt>Mean kinetic temperature</dt><dd>A single temperature that has the same cumulative effect as the whole fluctuating trace, computed from the core probe with ΔH = 83.144 kJ/mol. Brief spikes count for more than their duration suggests.</dd></div>
-            <div><dt>Recovery</dt><dd>The pod has no heater or cooler. When it returns to the band, that’s the insulated well and cold packs doing their job, and the report says so.</dd></div>
-            <div><dt>Edge AI verdict</dt><dd>The on-board model’s running quality score is shown as a flag, never as a replacement for the lab’s own judgement.</dd></div>
+            <div><dt>Status</dt><dd>Set by the receiving lab’s own rules. Demo rule: never outside 2–8 °C → VERIFIED; up to 10 min → WARNING; longer → EXCURSION.</dd></div>
+            <div><dt>Mean kinetic temperature</dt><dd>One temperature with the same overall effect as the whole wobbly trace (ΔH = 83.144 kJ/mol).</dd></div>
+            <div><dt>Recovery</dt><dd>No heater or cooler; coming back into the band is the insulation and cold packs working.</dd></div>
           </dl>
-        </Reveal>
-        <Reveal className="rep-col" delay={0.05}>
-          <Kicker>Into the lab system</Kicker>
-          <p className="body">The same summary is sent as a standard HL7 FHIR R4 Observation linked to the Specimen, so it lands in the lab’s existing system instead of another portal.</p>
-          <pre className="code" aria-label="Example FHIR Observation"><code>{fhir(sc)}</code></pre>
-        </Reveal>
+        </details>
+        <details className="more">
+          <summary>What lands in the hospital system (FHIR)</summary>
+          <pre className="code"><code>{fhir(sc)}</code></pre>
+        </details>
       </section>
     </>
   );

@@ -1,74 +1,92 @@
+import { lazy, Suspense, useCallback, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { ease } from '../motion.js';
+import { TAGLINE } from '../routes.js';
 import PcbHero from '../components/PcbHero.jsx';
 import Journey from '../components/Journey.jsx';
 import Witnesses from '../components/Witnesses.jsx';
 import { Reveal, Kicker } from '../components/Bits.jsx';
-import Prov from '../components/Prov.jsx';
+import { Rig, Hang, Peek } from '../components/Rig.jsx';
 
-const facts = [
-  ['46–68%', 'of laboratory errors happen before analysis: in collection, labelling, handling and transport.', 'Laboratory quality-indicator literature'],
-  ['±400 g', 'the highest impact the pod can record, enough to capture a dropped bag or a pneumatic-tube slam.', 'H3LIS331DL datasheet'],
-  ['0.03125 °C', 'temperature resolution of the platinum-probe converters that watch the vial.', 'MAX31865 datasheet'],
-];
+const PodViewer = lazy(() => import('../components/PodViewer.jsx'));
 
 export default function Overview() {
+  const [ready, setReady] = useState(false);
+  const [part, setPart] = useState(null);
+  const api = useRef(null);
+  const onReady = useCallback(() => setReady(true), []);
+
   return (
     <>
-      <PcbHero />
-
-      <section className="wrap section problem">
-        <Reveal className="problem-head">
-          <Kicker>The blind spot</Kicker>
-          <h2 className="h2">A sample that cooked in a hot car looks exactly like one that didn’t.</h2>
-        </Reveal>
-        <div className="problem-cols">
-          <Reveal className="problem-text" delay={0.05}>
-            <p className="body">Hospitals have spent decades perfecting analysers and lab software. The trip in between, from the patient’s arm to the analyser, is still a paper label and a courier. Heat, cold and hard knocks can burst blood cells or degrade tissue, and the lab usually can’t tell, so it either tests a compromised sample or asks the patient for another one.</p>
-            <p className="body">KronoTransit gives the specimen a witness. Five, in fact.</p>
-          </Reveal>
-          <dl className="facts">
-            {facts.map(([n, t, s], i) => (
-              <Reveal key={n} delay={0.08 * i} className="fact">
-                <dt>{n}</dt>
-                <dd>{t} <Prov k={i === 0 ? 'lit' : 'ds'} src={s} /></dd>
-              </Reveal>
-            ))}
-          </dl>
+      <section className="ov-hero">
+        <Rig
+          className="rig-ov-dk" from="left"
+          viewBox="0 0 620 520"
+          boards={[{ id: 'dk', x: 300, y: 330, w: 520, rot: 14 }]}
+          wires={[
+            { from: [190, 230], c1: [120, 200], c2: [40, 260], to: [-40, 250], color: 'red' },
+            { from: [200, 250], c1: [130, 250], c2: [50, 320], to: [-40, 320], color: 'black' },
+            { from: [215, 275], c1: [150, 310], c2: [60, 400], to: [-40, 400], color: 'yellow' },
+            { from: [235, 300], c1: [170, 360], c2: [90, 470], to: [-40, 480], color: 'blue' },
+            { from: [260, 330], c1: [210, 420], c2: [140, 520], to: [60, 560], color: 'green' },
+          ]}
+          led={[402, 410]}
+        />
+        <div className="ov-hero-copy">
+          <motion.p className="hero-k mono" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, ease }}>Student-built · biomedical engineering</motion.p>
+          <motion.h1 className="display" initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, ease }}>
+            {TAGLINE.replace('.', '')}<span className="dot">.</span>
+          </motion.h1>
+          <motion.p className="hero-lede" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.7, ease, delay: 0.15 }}>
+            A sealed pod that rides with a blood or tissue sample, watches it the whole way, and tells the lab if it’s still good.
+          </motion.p>
+          <div className="hero-links">
+            <Link to="/pod" className="go go-strong">Take it apart <span>→</span></Link>
+            <Link to="/lab-reports" className="go">See a lab report <span>→</span></Link>
+          </div>
         </div>
+
+        <figure className="scope">
+          <span className="crop tl" /><span className="crop tr" /><span className="crop bl" /><span className="crop br" />
+          <figcaption className="scope-cap mono"><b>Fig. 1</b> The prototype, pulled apart · every board and wire</figcaption>
+          <motion.div className="scope-view" initial={{ opacity: 0 }} animate={{ opacity: ready ? 1 : 0 }} transition={{ duration: 0.8, ease }}>
+            <Suspense fallback={null}><PodViewer apiRef={api} onReady={onReady} onHover={setPart} startExploded autoRotate /></Suspense>
+          </motion.div>
+          {!ready && <p className="scope-load mono">Unpacking the pod…</p>}
+          <div className="scope-foot">
+            <div className="scope-read" aria-live="polite"><span className="mono">Part</span><b>{part || 'Hover over the model'}</b></div>
+            <button className="ctl" onClick={() => api.current?.reset()}>Reset view</button>
+          </div>
+        </figure>
       </section>
 
-      <section className="section">
-        <div className="wrap"><Reveal><Kicker>The journey</Kicker><h2 className="h2">From the ward to the analyser, recorded end to end.</h2></Reveal></div>
+      <PcbHero />
+
+      <section className="section journey-wrap">
+        <Hang id="bme" className="rig-ov-vine" colors={['red', 'black', 'yellow', 'green', 'blue']} len={360} />
+        <div className="wrap"><Reveal><Kicker>The journey</Kicker><h2 className="h2">Ward to lab, every second on record.</h2></Reveal></div>
         <Journey />
       </section>
 
-      <section className="wrap section">
+      <section className="wrap section wit-wrap">
+        <Peek id="h3lis" side="right" className="rig-wit" colors={['orange', 'black', 'white']} />
         <Reveal className="sec-intro">
           <Kicker>Five witnesses</Kicker>
-          <h2 className="h2">No single sensor is trusted. The pod cross-examines all five.</h2>
-          <p className="body">A spike on one sensor is a rumour. The same story told by temperature, impact, air, light and identity together is evidence. Trigger an event and watch the streams answer.</p>
+          <h2 className="h2">Shake it. Bake it. Open it. Fly it.</h2>
+          <p className="body">Pick an event and watch all five sensors react. One sensor can be fooled; five agreeing can’t.</p>
         </Reveal>
         <Witnesses />
       </section>
 
-      <section className="wrap section handoff">
+      <section className="wrap section student">
+        <Peek id="bat" side="left" className="rig-student" rot={14} colors={['red', 'black']} />
         <Reveal>
-          <Kicker>At the lab</Kicker>
-          <h2 className="h2">The journey arrives before the sample is opened.</h2>
-        </Reveal>
-        <Reveal className="handoff-row" delay={0.05}>
-          <p className="body">On the dock, the pod’s signed log becomes a transport report: a verdict, a timeline of every reading, each deviation with its timestamp, and the chain of custody. See exactly what a receiving lab would get.</p>
-          <div className="handoff-links">
-            <Link className="go go-strong" to="/lab-reports">Open an example report <span>→</span></Link>
+          <p className="student-line">Designed, wired and coded by high school students.</p>
+          <div className="hero-links center">
+            <Link className="go go-strong" to="/grants">Help us pilot it <span>→</span></Link>
             <Link className="go" to="/engineering">See the engineering <span>→</span></Link>
           </div>
-        </Reveal>
-      </section>
-
-      <section className="wrap section student">
-        <Reveal>
-          <p className="student-line">Designed, wired and coded by high school students. Built to the standard of the labs it’s meant for.</p>
-          <Link className="go" to="/grants">Meet the team and help us pilot it <span>→</span></Link>
         </Reveal>
       </section>
     </>
