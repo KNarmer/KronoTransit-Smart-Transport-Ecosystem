@@ -17,11 +17,7 @@ const Mark = ({ v }) => (
 
 export default function Compare() {
   return (
-    <section className="section" id="compare">
-      <div className="sec-head head-center">
-        <h2 className="h-xl">Others log the box.<br />We witness the sample.</h2>
-        <p className="lede">Temperature loggers like TubeSense and TempTale, workflow tools like Roche navify, sensor tubes like SmartTube and stick-on heat strips each cover part of the trip.</p>
-      </div>
+    <div className="embed">
       <div className="table" role="table" aria-label="Comparison">
         <div className="trow thead" role="row">
           <span role="columnheader" />
@@ -34,6 +30,6 @@ export default function Compare() {
           </div>
         ))}
       </div>
-    </section>
+    </div>
   );
 }

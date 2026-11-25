@@ -70,11 +70,7 @@ export default function Sensors() {
   const V = Viz[active];
 
   return (
-    <section className="section" id="sensors">
-      <div className="sec-head head-right">
-        <h2 className="h-xl">Five witnesses<br />in one box.</h2>
-      </div>
-
+    <div className="sensors-wrap">
       <div className="sensors">
         <div className="tabs" role="tablist" aria-label="Sensors">
           {sensors.map((x) => (
@@ -100,6 +96,6 @@ export default function Sensors() {
           </AnimatePresence>
         </div>
       </div>
-    </section>
+    </div>
   );
 }

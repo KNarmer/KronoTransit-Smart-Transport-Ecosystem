@@ -1,5 +1,6 @@
-// Hero viewer: the real Kit B model (every board, wire and printed part from the bench-build app),
-// pulled apart, under hard low-key studio light. Drag to orbit; hover a part to see what it is.
+// The real Kit B model (every board, wire and printed part from the bench-build app), pulled apart.
+// Rendering notes: full device pixel ratio, anisotropic texture filtering, logarithmic depth (no z-fighting
+// flicker on coplanar labels and pads), no fog, and shadow biasing so faces don't shimmer as the view turns.
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
@@ -10,79 +11,68 @@ import { POD_GLB, DRACO } from './model.js';
 
 const HILITE = new THREE.Color('#d4ff3a');
 
-export default function PodViewer({ onReady }) {
+export default function PodViewer({ selected = null, onHover, onParts, onReady, autoRotate = true, controlsRef }) {
   const wrapRef = useRef(null);
-  const labelRef = useRef(null);
+  const api = useRef({});
 
   useEffect(() => {
     const wrap = wrapRef.current;
-    const label = labelRef.current;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, logarithmicDepthBuffer: true, powerPreference: 'high-performance' });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.05;
+    renderer.toneMappingExposure = 1.15;
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     wrap.appendChild(renderer.domElement);
+    const maxAniso = renderer.capabilities.getMaxAnisotropy();
 
     const scene = new THREE.Scene();
-    scene.fog = new THREE.Fog(0x07090c, 9, 22);
     const pmrem = new THREE.PMREMGenerator(renderer);
     scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
-    scene.environmentIntensity = 0.6;
+    scene.environmentIntensity = 0.75;
 
-    const camera = new THREE.PerspectiveCamera(28, 1, 0.1, 100);
+    const camera = new THREE.PerspectiveCamera(26, 1, 0.5, 200);
 
-    // Low-key lighting: one hard key from above-left, a cold rim from behind, a faint lime kicker.
-    scene.add(new THREE.HemisphereLight(0x9fb4c8, 0x050608, 0.25));
-    const key = new THREE.DirectionalLight(0xfff4e6, 3.8);
-    key.position.set(-4, 7, 5);
+    scene.add(new THREE.HemisphereLight(0xc8d6e4, 0x0a0c10, 0.35));
+    const key = new THREE.DirectionalLight(0xfff1e2, 3.4);
+    key.position.set(-5, 9, 6);
     key.castShadow = true;
-    key.shadow.mapSize.set(2048, 2048);
-    key.shadow.camera.left = -4; key.shadow.camera.right = 4; key.shadow.camera.top = 4; key.shadow.camera.bottom = -4;
-    key.shadow.bias = -0.0004; key.shadow.radius = 3;
+    key.shadow.mapSize.set(4096, 4096);
+    Object.assign(key.shadow.camera, { left: -6, right: 6, top: 6, bottom: -6, near: 1, far: 40 });
+    key.shadow.bias = -0.0002;
+    key.shadow.normalBias = 0.025;
     scene.add(key);
-    const rim = new THREE.DirectionalLight(0x4aa3ff, 6);
-    rim.position.set(5, 3, -6);
+    const rim = new THREE.DirectionalLight(0x5aa8ff, 3.2);
+    rim.position.set(6, 4, -7);
     scene.add(rim);
-    const kick = new THREE.PointLight(0xd4ff3a, 6, 6, 2);
-    kick.position.set(-2.4, 0.6, 2.2);
-    scene.add(kick);
 
-    // Floor: catches the shadow, plus a faint engineering grid that fades into fog.
-    const floor = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), new THREE.ShadowMaterial({ opacity: 0.55 }));
+    const floor = new THREE.Mesh(new THREE.PlaneGeometry(60, 60), new THREE.ShadowMaterial({ opacity: 0.45 }));
     floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true;
     scene.add(floor);
-    const grid = new THREE.GridHelper(40, 80, 0x1d2a36, 0x111820);
-    grid.material.transparent = true; grid.material.opacity = 0.55;
-    scene.add(grid);
 
     const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true; controls.dampingFactor = 0.06;
-    controls.enablePan = false;
-    controls.enableZoom = false;
-    controls.minPolarAngle = 0.35; controls.maxPolarAngle = 1.42;
-    controls.rotateSpeed = 0.6;
-    controls.autoRotate = !reduce; controls.autoRotateSpeed = 0.35;
+    controls.enableDamping = true; controls.dampingFactor = 0.08;
+    controls.enablePan = false; controls.enableZoom = false;
+    controls.minPolarAngle = 0.75; controls.maxPolarAngle = 1.38;
+    controls.rotateSpeed = 0.55;
+    controls.autoRotate = autoRotate && !reduce; controls.autoRotateSpeed = 0.4;
     controls.addEventListener('start', () => { controls.autoRotate = false; });
 
-    const parts = []; // { node, mats: Material[] }
-    let model = null;
-    let disposed = false;
+    const byLabel = new Map();
+    let model = null, disposed = false, home = null;
 
     const draco = new DRACOLoader().setDecoderPath(DRACO);
     new GLTFLoader().setDRACOLoader(draco).load(POD_GLB, (gltf) => {
       if (disposed) return;
       model = gltf.scene;
-      // The export is tilted for Canvas UI's low camera; stand it upright here.
-      model.traverse((o) => { if (o.parent === model) o.rotation.set(0, -0.62, 0); });
+      model.traverse((o) => { if (o.parent === model) o.rotation.set(0, -0.5, 0); });
       model.updateMatrixWorld(true);
       const box = new THREE.Box3().setFromObject(model);
       const size = box.getSize(new THREE.Vector3());
-      const s = 4.2 / Math.max(size.x, size.y, size.z);
-      model.scale.setScalar(s);
+      model.scale.setScalar(5.6 / Math.max(size.x, size.z));
       box.setFromObject(model);
       const c = box.getCenter(new THREE.Vector3());
       model.position.set(-c.x, -box.min.y, -c.z);
@@ -91,68 +81,75 @@ export default function PodViewer({ onReady }) {
       model.traverse((o) => {
         if (o.isMesh) {
           o.castShadow = true; o.receiveShadow = true;
-          o.material = o.material.clone(); // so highlights stay per-part
+          const m = o.material = o.material.clone();
+          for (const k of ['map', 'normalMap', 'roughnessMap', 'metalnessMap', 'emissiveMap']) if (m[k]) m[k].anisotropy = maxAniso;
+          // Decals and silkscreen sit a hair above their board: push them forward so they never flicker.
+          if (m.transparent || m.alphaTest > 0) { m.polygonOffset = true; m.polygonOffsetFactor = -2; m.polygonOffsetUnits = -2; }
         }
-        // GLTFLoader sanitises node names; the original is kept in userData.name.
         const raw = o.userData?.name || '';
         if (raw.startsWith('part:')) {
+          const name = raw.slice(5);
+          const label = /^[a-z0-9_]+$/.test(name) ? 'Wire' : name;
           const mats = [];
           o.traverse((m) => { if (m.isMesh) mats.push(m.material); });
-          const name = raw.slice(5);
-          // Unlabelled children carry internal ids (e.g. "amb_rn", "w_ldo_gnd"): those are wires and jumpers.
-          o.userData.label = /^[a-z0-9_]+$/.test(name) ? 'Wire' : name;
-          o.userData.mats = mats;
           mats.forEach((m) => { m.userData.baseEmissive = m.emissive ? m.emissive.clone() : null; });
-          parts.push(o);
+          o.userData.label = label; o.userData.mats = mats;
+          if (!byLabel.has(label)) byLabel.set(label, []);
+          byLabel.get(label).push(o);
         }
       });
 
-      const h = box.max.y - box.min.y;
-      controls.target.set(0, h * 0.5, 0);
-      camera.position.set(8.4, h * 0.85 + 1.7, 10.2);
+      const bb = new THREE.Box3().setFromObject(model);
+      const h = bb.max.y - bb.min.y;
+      controls.target.set(0, h * 0.42, 0);
+      camera.position.set(0.5, h * 0.62 + 2.2, 13.5);
       controls.update();
+      home = { pos: camera.position.clone(), target: controls.target.clone() };
+      onParts?.([...byLabel.keys()].filter((l) => l !== 'Wire'));
       onReady?.();
     });
 
-    // Hover: raycast once per frame at most, highlight the part, move the label without React state.
+    // Highlighting: hover (transient) and selection (sticky) share one tint routine.
+    let hovered = null, sticky = null;
+    const tint = (label, on, k = 0.28) => {
+      (byLabel.get(label) || []).forEach((o) => o.userData.mats.forEach((m) => {
+        if (!m.emissive) return;
+        if (on) { m.emissive.copy(HILITE); m.emissiveIntensity = k; }
+        else { m.emissive.copy(m.userData.baseEmissive); m.emissiveIntensity = 1; }
+      }));
+    };
+    const refresh = () => {
+      for (const l of byLabel.keys()) tint(l, false);
+      if (sticky) tint(sticky, true, 0.35);
+      if (hovered && hovered !== sticky) tint(hovered, true, 0.22);
+    };
+    api.current.select = (label) => { sticky = label; refresh(); };
+    api.current.reset = () => {
+      if (!home) return;
+      camera.position.copy(home.pos); controls.target.copy(home.target); controls.update();
+    };
+    if (controlsRef) controlsRef.current = api.current;
+
     const ray = new THREE.Raycaster();
     const ptr = new THREE.Vector2();
-    let pending = false, hovered = null, px = 0, py = 0, inside = false;
-    const partOf = (o) => { while (o && !o.userData.label) o = o.parent; return o; };
-    const setHover = (p) => {
-      if (p === hovered) return;
-      if (hovered) hovered.userData.mats.forEach((m) => { if (m.emissive) { m.emissive.copy(m.userData.baseEmissive); m.emissiveIntensity = 1; } });
-      hovered = p;
-      if (p) {
-        p.userData.mats.forEach((m) => { if (m.emissive) { m.emissive.copy(HILITE); m.emissiveIntensity = 0.22; } });
-        label.textContent = p.userData.label;
-        label.dataset.on = '1';
-        renderer.domElement.style.cursor = 'grab';
-      } else {
-        label.dataset.on = '';
-        renderer.domElement.style.cursor = '';
-      }
-    };
+    let pending = false, inside = false;
+    const labelOf = (o) => { while (o && !o.userData.label) o = o.parent; return o?.userData.label || null; };
     const onMove = (e) => {
       const r = renderer.domElement.getBoundingClientRect();
-      px = e.clientX - r.left; py = e.clientY - r.top; inside = true;
-      ptr.set((px / r.width) * 2 - 1, -(py / r.height) * 2 + 1);
-      pending = true;
+      ptr.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1);
+      inside = true; pending = true;
     };
-    const onLeave = () => { inside = false; setHover(null); };
+    const onLeave = () => { inside = false; if (hovered) { hovered = null; refresh(); onHover?.(null); } };
     renderer.domElement.addEventListener('pointermove', onMove);
     renderer.domElement.addEventListener('pointerleave', onLeave);
 
     const resize = () => {
       const w = wrap.clientWidth, h = wrap.clientHeight;
+      if (!w || !h) return;
       renderer.setSize(w, h, false);
       renderer.domElement.style.width = '100%'; renderer.domElement.style.height = '100%';
       camera.aspect = w / h;
-      // Narrow screens: widen the view so the whole model fits.
-      camera.fov = w / h < 0.9 ? 40 : 28;
-      // Wide screens: shift the frame so the model sits right of centre and clear of the headline.
-      if (w / h >= 0.9) camera.setViewOffset(w, h, -w * 0.14, -h * 0.02, w, h);
-      else camera.clearViewOffset();
+      camera.fov = w / h < 1 ? 38 : 26;
       camera.updateProjectionMatrix();
     };
     const ro = new ResizeObserver(resize); ro.observe(wrap); resize();
@@ -169,9 +166,9 @@ export default function PodViewer({ onReady }) {
         pending = false;
         ray.setFromCamera(ptr, camera);
         const hit = ray.intersectObject(model, true)[0];
-        setHover(hit ? partOf(hit.object) : null);
+        const l = hit ? labelOf(hit.object) : null;
+        if (l !== hovered) { hovered = l; refresh(); onHover?.(l); renderer.domElement.style.cursor = l ? 'grab' : ''; }
       }
-      if (hovered) label.style.transform = `translate(${px + 16}px, ${py + 16}px)`;
       renderer.render(scene, camera);
       raf = requestAnimationFrame(tick);
     }
@@ -191,11 +188,10 @@ export default function PodViewer({ onReady }) {
       renderer.dispose();
       wrap.removeChild(renderer.domElement);
     };
-  }, [onReady]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  return (
-    <div className="viewer" ref={wrapRef}>
-      <div className="viewer-label" ref={labelRef} aria-hidden="true" />
-    </div>
-  );
+  useEffect(() => { api.current.select?.(selected); }, [selected]);
+
+  return <div className="viewer" ref={wrapRef} />;
 }

@@ -37,12 +37,7 @@ export default function Score() {
   const state = score >= 85 ? ['Green · run the test', 'ok'] : score >= 70 ? ['Amber · review first', 'warn'] : ['Red · recollect', 'bad'];
 
   return (
-    <section className="section" id="score">
-      <div className="sec-head head-split">
-        <h2 className="h-xl">One answer a<br />lab can act on.</h2>
-        <p className="lede">The pod weighs everything together. A little warmth alone is fine. Warmth plus a gas spike is not. Try it.</p>
-      </div>
-
+    <div className="embed">
       <div className="score">
         <div className="score-controls">
           <div className="presets">
@@ -69,6 +64,6 @@ export default function Score() {
           <div className="score-state"><i className="led" />{state[0]}</div>
         </div>
       </div>
-    </section>
+    </div>
   );
 }

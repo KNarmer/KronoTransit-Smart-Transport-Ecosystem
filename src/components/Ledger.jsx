@@ -15,17 +15,7 @@ const rows = [
 
 export default function Ledger() {
   return (
-    <section className="section" id="record">
-      <div className="ledger">
-        <div className="sec-head ledger-head">
-          <h2 className="h-xl">A diary that can’t be quietly edited.</h2>
-          <p className="lede">Each entry is chained to the one before it and signed by the pod’s secure hardware. Change one line and the chain breaks. At the dock, the log becomes a standard FHIR record the lab system can read.</p>
-          <ul className="ledger-points">
-            <li><span>Hash-chained</span>every frame points to the last</li>
-            <li><span>Signed</span>on the nRF5340’s CryptoCell</li>
-            <li><span>FHIR R4</span>Specimen + Observation at the dock</li>
-          </ul>
-        </div>
+    <div className="embed ledger">
         <DecryptReveal
           className="ledger-box"
           radius={170}
@@ -39,7 +29,7 @@ export default function Ledger() {
           edgeGlow={1.2}
         >
           <div className="log">
-            <div className="log-top"><span>pod CC-0007 · trip 0143</span><span>specimen: whole blood</span></div>
+            <div className="log-top"><span>pod KT-0007 · trip 0143</span><span>specimen: whole blood</span></div>
             {rows.map(([t, k, v, s]) => (
               <div key={t} className={`log-row ${s}`}>
                 <span className="log-t">{t}</span><span className="log-k">{k}</span><span className="log-v">{v}</span>
@@ -49,7 +39,6 @@ export default function Ledger() {
           </div>
         </DecryptReveal>
         <p className="fine ledger-hint">Move your cursor over the log to decrypt it. Sample trip shown for illustration.</p>
-      </div>
-    </section>
+    </div>
   );
 }
