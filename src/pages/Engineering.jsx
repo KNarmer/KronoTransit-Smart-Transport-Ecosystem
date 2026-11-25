@@ -6,7 +6,7 @@ import CostExplorer from '../components/CostExplorer.jsx';
 import { Reveal, Kicker } from '../components/Bits.jsx';
 import { Hang, Peek, hw } from '../components/Rig.jsx';
 import Telemetry from '../components/Telemetry.jsx';
-import PodSpinner from '../components/PodSpinner.jsx';
+import Sci from '../components/Sci.jsx';
 
 const RAILS = [
   ['VBAT', '3.0–4.2 V', 'LiPo through the fuel gauge', '≈0.20 A worst case'],
@@ -25,18 +25,17 @@ export default function Engineering() {
   return (
     <>
       <section className="wrap lead-block lead-split">
+        <Hang id="pp1" className="rig-top" colors={['red', 'black', 'yellow', 'blue']} len={160} w={190} rot={6} />
         <div>
           <Kicker>Engineering & BOM</Kicker>
           <h1 className="h1">Every board, every wire, every dollar.</h1>
           <p className="lede">Off-the-shelf boards today, one custom PCB tomorrow.</p>
         </div>
-        <PodSpinner exploded caption="The prototype, exploded · hover a part" />
+        <Sci kind="wire" tag="E" label="Wireframe · drag to rotate" />
       </section>
       <Telemetry />
 
       <section className="wrap section gallery-wrap">
-        <Peek id="pp1" side="right" className="rig-gal" w={460} colors={['red', 'black', 'yellow', 'blue']} />
-        <Hang id="h3lis" className="rig-gal-hang" colors={['orange', 'black', 'white']} len={160} w={170} rot={10} />
         <Reveal><Kicker>The parts</Kicker><h2 className="h2">Meet the hardware.</h2></Reveal>
         <ul className="gallery">
           {gallery.map((c, i) => (
@@ -70,7 +69,6 @@ export default function Engineering() {
       </section>
 
       <section className="wrap section bus-wrap">
-        <Hang id="core" className="rig-bus" colors={['red', 'black', 'yellow', 'blue']} len={260} w={220} rot={-6} />
         <Reveal><Kicker>Wiring</Kicker><h2 className="h2">Follow any wire.</h2></Reveal>
         <BusExplorer />
         <details className="more">
@@ -102,7 +100,6 @@ export default function Engineering() {
       </section>
 
       <section className="wrap section cost-wrap">
-        <Peek id="boost" side="left" className="rig-cost" w={300} rot={16} colors={['red', 'black']} />
         <Reveal><Kicker>Cost</Kicker><h2 className="h2">One pod at 1, 50 and 1,000.</h2></Reveal>
         <CostExplorer />
       </section>

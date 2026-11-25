@@ -9,6 +9,7 @@ import Witnesses from '../components/Witnesses.jsx';
 import { Reveal, Kicker } from '../components/Bits.jsx';
 import { Rig, Hang, Peek } from '../components/Rig.jsx';
 import Telemetry from '../components/Telemetry.jsx';
+import Sci from '../components/Sci.jsx';
 
 const PodViewer = lazy(() => import('../components/PodViewer.jsx'));
 
@@ -66,27 +67,32 @@ export default function Overview() {
       <PcbHero />
 
       <section className="section journey-wrap">
-        <Hang id="bme" className="rig-ov-vine" colors={['red', 'black', 'yellow', 'green', 'blue']} len={360} />
         <div className="wrap"><Reveal><Kicker>The journey</Kicker><h2 className="h2">Ward to lab, every second on record.</h2></Reveal></div>
         <Journey />
       </section>
 
       <Telemetry className="tl-alt" />
       <section className="wrap section wit-wrap">
-        <Hang id="lsm6" className="rig-wit-hang" colors={['white', 'blue', 'black']} len={200} w={190} rot={-9} />
-        <Peek id="h3lis" side="right" className="rig-wit" colors={['orange', 'black', 'white']} />
         <Reveal className="sec-intro">
           <Kicker>Five witnesses</Kicker>
           <h2 className="h2">Shake it. Bake it. Open it. Fly it.</h2>
-          <p className="body">Pick an event and watch all five sensors react. One sensor can be fooled; five agreeing can’t.</p>
+          <p className="body">Pick an event. Watch all five react.</p>
         </Reveal>
         <Witnesses />
       </section>
 
+      <section className="wrap section">
+        <Reveal><Kicker>Same pod, four instruments</Kicker><h2 className="h2">Look at it the way an engineer does.</h2></Reveal>
+        <div className="sci-row">
+          <Sci kind="wire" tag="01" label="Structure" />
+          <Sci kind="topo" tag="02" label="Contour survey" />
+          <Sci kind="ascii" tag="03" label="Signal" />
+          <Sci kind="dither" tag="04" label="1-bit scan" />
+        </div>
+      </section>
+
       <section className="wrap section student">
         <Peek id="bat" side="left" className="rig-student" rot={14} colors={['red', 'black']} />
-        <Hang id="rtc" className="rig-st-a" colors={['yellow', 'black', 'red']} len={180} w={170} rot={8} />
-        <Hang id="gauge" className="rig-st-b" colors={['purple', 'orange']} len={260} w={160} rot={-14} />
         <Reveal>
           <p className="student-line">Designed, wired and coded by high school students.</p>
           <div className="hero-links center">

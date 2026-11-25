@@ -21,7 +21,7 @@ const labels = [
   ['nRF5340 DK on 12 mm standoffs', 140, 24, 'r'],
   ['Colour sensor at optical window', 70, 96, 'l'],
   ['Core PT1000 clipped to glass', 82, 132, 'l'],
-  ['Gas sensor at vent', 30, 128, 'l'],
+  ['Gas sensor at vent', 30, 112, 'l'],
 ];
 
 export default function CrossSection() {
@@ -56,7 +56,7 @@ export default function CrossSection() {
         {/* sensors on cradle faces */}
         <rect x={x(70)} y={y(100)} width={10} height={22} className="xs-sensor" />
         <rect x={x(110)} y={y(92)} width={10} height={22} className="xs-sensor" />
-        <rect x={x(30)} y={y(132)} width={22} height={10} className="xs-sensor" />
+        <rect x={x(30)} y={y(112)} width={22} height={10} className="xs-sensor" />
         <circle cx={x(84)} cy={y(126)} r="4" className="xs-probe" />
         {/* mid deck */}
         <rect x={x(3)} y={y(45)} width={(190 - 6) * S} height={3 * S} className="xs-deck" />
@@ -84,7 +84,7 @@ export default function CrossSection() {
           );
         })}
       </svg>
-      <figcaption className="mono">Section A–A, to scale. Dimensions from the CAD layout <Prov k="est" /></figcaption>
+      <figcaption className="mono">Section A–A · to scale</figcaption>
     </figure>
   );
 }

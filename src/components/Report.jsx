@@ -1,6 +1,7 @@
 // A transport report as a receiving lab would see it. Demonstration data only.
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { BAND } from '../data/scenarios.js';
+import { DecryptReveal } from './canvasui/DecryptReveal.tsx';
 
 const W = 1000, PADL = 54, PADR = 10;
 const ROWS = [
@@ -123,9 +124,10 @@ export default function Report({ sc }) {
       <section className="audit">
         <div className="audit-h">
           <h3 className="h3">Audit log</h3>
-          <p className="body">Every entry is hashed together with the one before it (SHA-256, computed live in your browser). Alter any line and every hash after it stops matching the signed chain.</p>
+          <p className="body">Each line is chained to the last. Change one and every hash after it breaks.</p>
           <button className={`ctl ${tamper ? 'on' : ''}`} onClick={() => setTamper((v) => !v)}>{tamper ? 'Restore original log' : 'Try to edit the impact entry'}</button>
         </div>
+        <DecryptReveal className="log-crypt" radius={190} cell={13} color="#5b9dff" colored={0.4} background="rgba(0,0,0,0)" passthrough={0.08} scramble={0.2} scrambleSpeed={8}>
         <table className="log">
           <thead><tr><th>Time</th><th>Source</th><th>Event</th><th>Chain</th></tr></thead>
           <tbody>
@@ -142,6 +144,7 @@ export default function Report({ sc }) {
             })}
           </tbody>
         </table>
+        </DecryptReveal>
       </section>
     </article>
   );

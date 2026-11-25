@@ -5,7 +5,7 @@ import { REPO } from '../routes.js';
 import { Reveal, Kicker } from '../components/Bits.jsx';
 import Prov from '../components/Prov.jsx';
 import { Hang, Peek } from '../components/Rig.jsx';
-import PodSpinner from '../components/PodSpinner.jsx';
+import Sci from '../components/Sci.jsx';
 import Telemetry from '../components/Telemetry.jsx';
 
 // Add a public contact address here when you have one; until then, visitors are sent to GitHub.
@@ -62,18 +62,17 @@ export default function Grants() {
   return (
     <>
       <section className="wrap lead-block grants-hero lead-split">
+        <Hang id="magDock" className="rig-top" colors={['red', 'black', 'white', 'green', 'yellow']} len={160} w={190} rot={6} />
         <div>
           <Kicker>Grants & Team</Kicker>
           <h1 className="h1">We’ve got the wiring. <em>Got a power supply?</em></h1>
           <p className="lede">High school students looking for grants, pilot sites and mentors. No funding yet — that’s what this page is for.</p>
         </div>
-        <PodSpinner caption="This is what you’d be powering · drag me" spin={1.2} />
+        <Sci kind="particles" tag="P" label="Wave your cursor through it" />
       </section>
       <Telemetry />
 
       <section className="wrap section ports-wrap">
-        <Hang id="magDock" className="rig-lead" colors={['red', 'black', 'white', 'green', 'yellow']} w={260} rot={6} />
-        <Hang id="as7341" className="rig-lead2" colors={['orange', 'purple', 'blue']} len={220} w={170} rot={-12} />
         <Reveal><Kicker>Plug in</Kicker><h2 className="h2">Five ways to connect.</h2></Reveal>
         <ul className="ports">
           {PORTS.map(([code, title, text, subject], i) => <Port key={code} code={code} title={title} text={text} subject={subject} i={i} />)}
@@ -81,7 +80,6 @@ export default function Grants() {
       </section>
 
       <section className="wrap section unlocks">
-        <Peek id="chg" side="right" className="rig-unlock" colors={['red', 'black']} />
         <Reveal><Kicker>What funding unlocks</Kicker><h2 className="h2">Small numbers, large steps.</h2></Reveal>
         <ol>
           {UNLOCKS.map(([v, t, k], i) => (

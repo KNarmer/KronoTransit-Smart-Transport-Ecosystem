@@ -13,10 +13,10 @@ const BOARDS = [
   ['bme', 'BME688', 'Leaks, decay gases, humidity, pressure', 1335, 175, 180, [[1335, 248], [1335, 305], [1215, 305], [1215, 392]], 3, 'data'],
   ['as7341', 'AS7341', 'Reads the cartridge’s colour indicator', 1530, 390, 170, [[1455, 400], [1390, 400], [1390, 470], [1330, 470]], 3, 'data'],
   ['core', 'MAX31865', 'Core and ambient platinum thermometry', 1510, 640, 180, [[1425, 640], [1330, 640]], 4, 'thermal'],
-  ['nfc', 'ST25R3916B', 'Knows which cartridge is inside', 1400, 880, 200, [[1400, 800], [1400, 735], [1260, 735], [1260, 655]], 4, 'data'],
-  ['pi', 'Raspberry Pi Zero 2 W', 'KronoDock: verifies and forwards the log', 1075, 885, 250, [[1075, 805], [1075, 655]], 3, 'ctrl'],
-  ['chg', 'bq24074', 'Charges from the dock while running', 815, 875, 170, [[815, 800], [815, 715], [955, 715], [955, 655]], 2, 'power'],
-  ['gauge', 'MAX17048', 'Battery fuel gauge', 590, 900, 140, [[590, 830], [590, 780], [900, 780], [900, 640]], 2, 'power'],
+  ['nfc', 'ST25R3916B', 'Knows which cartridge is inside', 1400, 850, 200, [[1400, 800], [1400, 735], [1260, 735], [1260, 655]], 4, 'data'],
+  ['pi', 'Raspberry Pi Zero 2 W', 'KronoDock: verifies and forwards the log', 1075, 850, 250, [[1075, 805], [1075, 655]], 3, 'ctrl'],
+  ['chg', 'bq24074', 'Charges from the dock while running', 815, 850, 170, [[815, 800], [815, 715], [955, 715], [955, 655]], 2, 'power'],
+  ['gauge', 'MAX17048', 'Battery fuel gauge', 590, 860, 140, [[590, 830], [590, 780], [900, 780], [900, 640]], 2, 'power'],
 ];
 
 export default function PcbHero() { // now the 'What's inside' circuit section
@@ -25,7 +25,7 @@ export default function PcbHero() { // now the 'What's inside' circuit section
 
   return (
     <section className="hero circuit">
-      <svg className="pcb" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <svg className="pcb" viewBox="0 0 1600 1000" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
         <defs>
           <pattern id="vias" width="40" height="40" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r="1.1" className="via" /></pattern>
           <filter id="shadow" x="-20%" y="-20%" width="140%" height="150%"><feDropShadow dx="0" dy="14" stdDeviation="12" floodColor="#000" floodOpacity="0.45" /></filter>

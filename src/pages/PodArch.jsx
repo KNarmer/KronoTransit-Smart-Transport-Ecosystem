@@ -5,7 +5,8 @@ import { COMPONENTS } from '../data/components.js';
 import Prov from '../components/Prov.jsx';
 import { Reveal, Kicker } from '../components/Bits.jsx';
 import CrossSection from '../components/CrossSection.jsx';
-import { Hang, Peek } from '../components/Rig.jsx';
+import { Hang } from '../components/Rig.jsx';
+import Sci from '../components/Sci.jsx';
 import Telemetry from '../components/Telemetry.jsx';
 
 const PodViewer = lazy(() => import('../components/PodViewer.jsx'));
@@ -40,8 +41,7 @@ export default function PodArch() {
   return (
     <>
       <section className="wrap lead-block">
-        <Hang id="nfc" className="rig-lead" colors={['blue', 'white', 'black', 'red', 'yellow']} />
-        <Hang id="lsm6" className="rig-lead2" colors={['green', 'black', 'white']} len={200} w={180} rot={-10} />
+        <Hang id="nfc" className="rig-top" colors={['blue', 'white', 'black', 'red', 'yellow']} len={160} w={180} />
         <Kicker>Pod Architecture</Kicker>
         <h1 className="h1">Seventeen subsystems in a lunch-tin-sized box.</h1>
         <p className="lede">Pick a part. The camera flies to it and everything else turns to glass.</p>
@@ -67,13 +67,10 @@ export default function PodArch() {
                   <>
                     <p className="hud-k mono">{comp.group} · {comp.board}</p>
                     <h3>{comp.name}</h3>
-                    <p className="hud-maker">{comp.maker}</p>
-                    <p className="hud-role">{comp.role}</p>
+                                        <p className="hud-role">{comp.role}</p>
                     <dl className="hud-dl">
                       <div><dt>Interface</dt><dd>{comp.iface}</dd></div>
-                      <div><dt>Supply</dt><dd>{comp.supply[0]} <Prov k={comp.supply[1]} src={comp.ref[0]} /></dd></div>
-                      <div><dt>Power</dt><dd>{comp.power[0]} <Prov k={comp.power[1]} src={comp.ref[0]} /></dd></div>
-                      {comp.specs.map(([k, v, p]) => <div key={k}><dt>{k}</dt><dd>{v} <Prov k={p} src={comp.ref[0]} /></dd></div>)}
+                      {comp.specs.slice(0, 2).map(([k, v]) => <div key={k}><dt>{k}</dt><dd>{v}</dd></div>)}
                     </dl>
                     {comp.ref[1] && <a className="hud-ref" href={comp.ref[1]} target="_blank" rel="noreferrer">Source: {comp.ref[0]} ↗</a>}
                   </>
@@ -106,13 +103,9 @@ export default function PodArch() {
 
       <Telemetry />
       <section className="wrap section xs-wrap">
-        <Peek id="pp2" side="right" className="rig-xs" colors={['red', 'blue', 'yellow']} />
         <Reveal><Kicker>Cross-section</Kicker><h2 className="h2">How the layers stack.</h2></Reveal>
         <div className="xs-grid">
-          <Reveal className="xs-copy">
-            <p className="body">The sample sits in the middle, wrapped in foam and cold packs. The electronics live underneath, away from the cold.</p>
-            <p className="note">No heater or cooler: an earlier Peltier design would have drained the battery in minutes. <Prov k="est" /></p>
-          </Reveal>
+          <Sci kind="wire" tag="A" label="Wireframe" className="xs-sci" />
           <CrossSection />
         </div>
       </section>

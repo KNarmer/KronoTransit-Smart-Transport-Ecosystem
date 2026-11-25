@@ -4,7 +4,8 @@ import { ease } from '../motion.js';
 import { SCENARIOS, BAND } from '../data/scenarios.js';
 import Report from '../components/Report.jsx';
 import { Reveal, Kicker } from '../components/Bits.jsx';
-import { Hang, Peek } from '../components/Rig.jsx';
+import { Hang } from '../components/Rig.jsx';
+import Sci from '../components/Sci.jsx';
 import Telemetry from '../components/Telemetry.jsx';
 
 const fhir = (sc) => JSON.stringify({
@@ -28,13 +29,15 @@ export default function LabReports() {
 
   return (
     <>
-      <section className="wrap lead-block">
-        <Hang id="as7341" className="rig-lead" colors={['green', 'white', 'red', 'black']} rot={-8} />
-        <Hang id="rtc" className="rig-lead2" colors={['yellow', 'black', 'blue']} len={220} w={200} rot={9} />
-        <Kicker>Lab Reports</Kicker>
-        <h1 className="h1">What the lab sees when the pod docks.</h1>
-        <p className="lede">A verdict first, then the evidence. Drag across the timeline, or try to tamper with the log.</p>
-        <p className="flag mono">Illustrative demo data · not bench measurements · no clinical validation yet</p>
+      <section className="wrap lead-block lead-split">
+        <Hang id="as7341" className="rig-top" colors={['green', 'white', 'red', 'black']} len={160} w={150} rot={-8} />
+        <div>
+          <Kicker>Lab Reports</Kicker>
+          <h1 className="h1">What the lab sees when the pod docks.</h1>
+          <p className="lede">Verdict first. Then drag the timeline, or try to tamper with the log.</p>
+          <p className="flag mono">Illustrative demo data · no clinical validation yet</p>
+        </div>
+        <Sci kind="topo" tag="R" label="Contour survey of the pod" />
       </section>
 
       <Telemetry />
@@ -56,7 +59,6 @@ export default function LabReports() {
       </section>
 
       <section className="wrap section rep-more">
-        <Peek id="pi" side="left" className="rig-rep" rot={10} colors={['red', 'black', 'green']} />
         <details className="more">
           <summary>How to read this report</summary>
           <dl className="defs">

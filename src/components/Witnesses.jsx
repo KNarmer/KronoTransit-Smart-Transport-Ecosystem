@@ -19,25 +19,25 @@ const EVENTS = {
     name: 'Ambulance pothole', dur: 70,
     reads: ['Temperature steady', 'Single 38 g spike', 'Air unchanged', 'No light, no colour change', 'Same cartridge, still seated'],
     hot: [0, 1, 0, 0, 0], verdict: ['ok', 'Logged, not condemned'],
-    why: 'One mechanical shock with every other witness quiet. The report records the time and peak g so the lab can judge haemolysis risk; on its own it doesn’t flag the sample.',
+    why: 'One bump, everything else calm. Logged, not flagged.',
   },
   heat: {
     name: 'Summer tarmac heat', dur: 200,
     reads: ['Ambient climbs fast; core follows slowly', 'Steady', 'Gas drifts slightly with temperature', 'Indicator begins to shift', 'Same cartridge, still seated'],
     hot: [2, 0, 1, 1, 0], verdict: ['warn', 'Amber · review before analysis'],
-    why: 'Core temperature is following ambient, and the colour indicator agrees chemically. Two independent witnesses confirm real thermal exposure; risk grows with minutes above the band.',
+    why: 'Heat and the colour indicator agree. That’s real exposure.',
   },
   lid: {
     name: 'Unauthorised lid opening', dur: 110,
     reads: ['Ambient step as outside air enters', 'Small handling motion', 'Humidity and pressure blip', 'Light floods a closed pod', 'Cartridge present, seat closed'],
     hot: [1, 1, 1, 2, 0], verdict: ['bad', 'Chain of custody broken'],
-    why: 'Light inside a sealed pod is impossible unless it was opened. Air and temperature agree. The event is written into the signed log; the lab sees exactly when.',
+    why: 'Light inside a sealed box means someone opened it.',
   },
   altitude: {
     name: 'High-altitude pressure shift', dur: 160,
     reads: ['Steady', 'Steady', 'Pressure falls; gas baseline shifts', 'No light, no colour change', 'Same cartridge, still seated'],
     hot: [0, 0, 1, 0, 0], verdict: ['ok', 'False alarm avoided'],
-    why: 'Only pressure changed, with no thermal, chemical-indicator or mechanical change. The gas reading is re-referenced to the new pressure instead of raising a leak alarm.',
+    why: 'Only pressure moved. Not a leak — no alarm.',
   },
 };
 
@@ -145,17 +145,17 @@ export default function Witnesses() {
                 <h4 className={`v v-${E.verdict[0]}`}>{E.verdict[1]}</h4>
                 <p>{E.why}</p>
                 <ul className="wit-vote">
-                  {STREAMS.map(([name], i) => <li key={name} className={`vote h${E.hot[i]}`}><i />{name}</li>)}
+                  {STREAMS.map(([name], i) => <li key={name} className={`vote hv${E.hot[i]}`}><i />{name}</li>)}
                 </ul>
               </motion.div>
             ) : (
               <motion.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
                 <h4 className="v v-ok">All witnesses agree</h4>
-                <p>A steady, cold, quiet trip. Pick an event above to see how a single disturbance looks to five independent sensors, and why the pod doesn’t trust any one of them alone.</p>
+                <p>Cold, steady, quiet. Pick an event above.</p>
               </motion.div>
             )}
           </AnimatePresence>
-          <p className="wit-note">Illustrative simulation. The rules shown are the design intent; the on-device model is still being trained on real labelled runs.</p>
+          <p className="wit-note">Illustrative simulation.</p>
         </aside>
       </div>
     </div>

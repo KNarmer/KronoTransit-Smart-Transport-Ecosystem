@@ -700,3 +700,62 @@ h1, h2, h3, h4 { margin: 0; font-weight: 500; text-wrap: balance; }
 .spinner { height: clamp(420px, 42vw, 620px); }
 .journey-step { min-height: 46vh; }
 .journey-steps { padding: 12vh 0 18vh; }
+
+/* =================== round 4: technical type, Canvas UI instrument panels, tidy placement =================== */
+:root {
+  --serif: 'Space Grotesk', ui-sans-serif, system-ui, sans-serif;
+  --sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+}
+.display, .h1, .h2, .h3, .hud h3, .scen-a b, .triage b, .cost-big, .cost-n, .fact dt, .unlocks b, .bus-info h4, .wit-verdict .v, .student-line, .foot-tag, .sheet-a {
+  font-family: var(--serif); font-style: normal; letter-spacing: -0.035em; font-weight: 600;
+}
+.display { font-size: clamp(42px, 5vw, 84px); line-height: 1; letter-spacing: -0.045em; }
+.h1 { font-size: clamp(36px, 4.4vw, 68px); line-height: 1.02; }
+.h2 { font-size: clamp(28px, 3vw, 46px); line-height: 1.08; }
+.h1 em { font-style: normal; color: var(--accent); }
+.student-line { font-weight: 500; letter-spacing: -0.02em; }
+.foot-tag { font-weight: 400; letter-spacing: -0.01em; font-size: 19px; }
+.wit-verdict .v { font-size: 26px; }
+body { font-size: 16.5px; }
+
+/* source markers: small dots only */
+.prov { display: inline-block; width: 6px; height: 6px; padding: 0; margin: 0 0 0 6px; border-radius: 50%; vertical-align: 0.2em; background: var(--ink-3); opacity: 0.7; cursor: help; }
+.prov-ds { background: var(--accent); } .prov-est { background: var(--ink-3); } .prov-quote { background: var(--ok); } .prov-lit { background: var(--ink-2); } .prov-bench { background: var(--blood); }
+.prov-key { display: flex; flex-wrap: wrap; gap: 8px 22px; grid-template-columns: none; font: 400 12px var(--mono); color: var(--ink-3); margin: 0 0 18px; }
+.prov-key .prov { margin: 0 6px 0 0; }
+.flag { color: var(--ink-3); margin-top: 18px; }
+
+/* vote list (was colliding with the .h1 heading class) */
+.vote { font-size: 14px; color: var(--ink-2); }
+.vote.hv1 i { background: var(--warn); } .vote.hv2 i { background: var(--bad); }
+
+/* instrument panels */
+.sci { position: relative; margin: 0; min-height: 340px; height: 100%;
+  background: radial-gradient(60% 60% at 50% 50%, color-mix(in srgb, var(--accent) 9%, transparent), transparent 72%),
+    linear-gradient(var(--via) 1px, transparent 1px) 0 0 / 32px 32px, linear-gradient(90deg, var(--via) 1px, transparent 1px) 0 0 / 32px 32px; }
+.sci-gl { position: absolute !important; inset: 0; color: var(--ink-2); }
+.sci .crop { width: 16px; height: 16px; border-width: 0; border-color: var(--accent); }
+.sci .crop.tl { border-width: 1.5px 0 0 1.5px; } .sci .crop.tr { border-width: 1.5px 1.5px 0 0; }
+.sci .crop.bl { border-width: 0 0 1.5px 1.5px; } .sci .crop.br { border-width: 0 1.5px 1.5px 0; }
+.sci-cap { position: absolute; left: 14px; bottom: 10px; z-index: 2; pointer-events: none; }
+.sci-cap b { color: var(--accent); font-weight: 600; margin-right: 10px; }
+.sci-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 32px; }
+.sci-row .sci { height: 360px; }
+.lead-split { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(24px, 4vw, 64px); align-items: stretch; }
+.lead-split > .sci { min-height: clamp(360px, 34vw, 500px); }
+.lead-split > div { align-self: center; }
+.xs-grid { grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.4fr); align-items: stretch; }
+.xs-sci { min-height: 420px; }
+
+/* hanging boards only from the very top of a page, in the gap above the visual */
+.rig-top { top: 0; right: max(var(--gut), calc((100vw - 1340px) / 2 + 24px)); width: 170px; z-index: 3; }
+.lead-split { padding-top: clamp(96px, 9vw, 130px); }
+.log-crypt { position: relative; }
+
+@media (max-width: 1100px) { .sci-row { grid-template-columns: 1fr 1fr; } }
+@media (max-width: 860px) {
+  .lead-split, .sci-row, .xs-grid { grid-template-columns: 1fr; }
+  .rig-top { width: 110px; right: 8px; }
+  .lead-split > .sci { min-height: 340px; }
+}
