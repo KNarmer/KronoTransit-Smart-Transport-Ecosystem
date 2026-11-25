@@ -5,7 +5,8 @@ import { REPO } from '../routes.js';
 import { Reveal, Kicker } from '../components/Bits.jsx';
 import Prov from '../components/Prov.jsx';
 import { Hang, Peek, Bench } from '../components/Rig.jsx';
-import Sci from '../components/Sci.jsx';
+import { lazy, Suspense } from 'react';
+const BoardViewer = lazy(() => import('../components/BoardViewer.jsx'));
 
 // Add a public contact address here when you have one; until then, visitors are sent to GitHub.
 const CONTACT_EMAIL = '';
@@ -61,13 +62,12 @@ export default function Grants() {
   return (
     <>
       <section className="wrap lead-block grants-hero lead-split">
-        <Hang id="magDock" className="rig-top" colors={['red', 'black', 'white', 'green', 'yellow']} len={160} w={190} rot={6} />
         <div>
           <Kicker>Grants & Team</Kicker>
           <h1 className="h1">We’ve got the wiring. <em>Got a power supply?</em></h1>
           <p className="lede">High school students looking for grants, pilot sites and mentors. No funding yet — that’s what this page is for.</p>
         </div>
-        <Sci kind="particles" tag="P" label="Wave your cursor through it" scale={4} />
+        <figure className="lead-board"><Suspense fallback={null}><BoardViewer id="bat" spin={2} zoom={false} /></Suspense><figcaption className="mono">Our current power supply. 2,500 mAh. Help us upgrade · drag me</figcaption></figure>
       </section>
 
       <section className="wrap section ports-wrap">

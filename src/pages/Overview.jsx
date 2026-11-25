@@ -9,7 +9,7 @@ import Witnesses from '../components/Witnesses.jsx';
 import { Reveal, Kicker } from '../components/Bits.jsx';
 import { Rig, Hang, Peek, Bench } from '../components/Rig.jsx';
 import Telemetry from '../components/Telemetry.jsx';
-import Sci from '../components/Sci.jsx';
+import InAction from '../components/InAction.jsx';
 
 const PodViewer = lazy(() => import('../components/PodViewer.jsx'));
 
@@ -81,13 +81,8 @@ export default function Overview() {
       </section>
 
       <section className="wrap section">
-        <Reveal><Kicker>Same pod, four instruments</Kicker><h2 className="h2">Look at it the way an engineer does.</h2></Reveal>
-        <div className="sci-row">
-          <Sci kind="wire" tag="01" label="Structure" scale={3.6} />
-          <Sci kind="topo" tag="02" label="Contour survey" scale={3.6} />
-          <Sci kind="ascii" tag="03" label="Signal" scale={3.8} />
-          <Sci kind="dither" tag="04" label="1-bit scan" scale={3.6} />
-        </div>
+        <Reveal><Kicker>Inside, in action</Kicker><h2 className="h2">Switch it on. See what each part is doing.</h2></Reveal>
+        <InAction />
       </section>
 
       <section className="wrap section student">

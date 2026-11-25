@@ -5,7 +5,8 @@ import { SCENARIOS, BAND } from '../data/scenarios.js';
 import Report from '../components/Report.jsx';
 import { Reveal, Kicker } from '../components/Bits.jsx';
 import { Hang, Bench } from '../components/Rig.jsx';
-import Sci from '../components/Sci.jsx';
+import { lazy, Suspense } from 'react';
+const BoardViewer = lazy(() => import('../components/BoardViewer.jsx'));
 
 const fhir = (sc) => JSON.stringify({
   resourceType: 'Observation',
@@ -29,14 +30,13 @@ export default function LabReports() {
   return (
     <>
       <section className="wrap lead-block lead-split">
-        <Hang id="as7341" className="rig-top" colors={['green', 'white', 'red', 'black']} len={160} w={150} rot={-8} />
         <div>
           <Kicker>Lab Reports</Kicker>
           <h1 className="h1">What the lab sees when the pod docks.</h1>
           <p className="lede">Verdict first. Then drag the timeline, or try to tamper with the log.</p>
           <p className="flag mono">Illustrative demo data · no clinical validation yet</p>
         </div>
-        <Sci kind="topo" tag="R" label="Contour survey of the pod" scale={4} />
+        <figure className="lead-board"><Suspense fallback={null}><BoardViewer id="pi" spin={1.4} zoom={false} /></Suspense><figcaption className="mono">KronoDock’s Raspberry Pi — it checks every signature · drag me</figcaption></figure>
       </section>
       <section className="wrap scen">
         <div className="scen-pick" role="tablist" aria-label="Scenario">

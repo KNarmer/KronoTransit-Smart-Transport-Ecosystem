@@ -19,6 +19,7 @@ function Wire({ d, color, w = 5 }) {
       <path d={d} fill="none" stroke="#050607" strokeOpacity="0.45" strokeWidth={w + 2} strokeLinecap="round" />
       <path d={d} fill="none" stroke={color} strokeWidth={w} strokeLinecap="round" />
       <path d={d} fill="none" stroke="#fff" strokeOpacity="0.35" strokeWidth={w * 0.26} strokeLinecap="round" transform={`translate(${-w * 0.18} ${-w * 0.2})`} />
+      <path d={d} className="zap" style={{ animationDelay: `${(d.length % 13) * -0.17}s` }} />
     </g>
   );
 }

@@ -6,7 +6,6 @@ import Prov from '../components/Prov.jsx';
 import { Reveal, Kicker } from '../components/Bits.jsx';
 import CrossSection from '../components/CrossSection.jsx';
 import { Hang, Bench } from '../components/Rig.jsx';
-import Sci from '../components/Sci.jsx';
 
 const PodViewer = lazy(() => import('../components/PodViewer.jsx'));
 const GROUPS = ['Cartridge well', 'Backbone', 'Base tray', 'Shell', 'KronoDock'];
@@ -40,7 +39,6 @@ export default function PodArch() {
   return (
     <>
       <section className="wrap lead-block">
-        <Hang id="nfc" className="rig-top" colors={['blue', 'white', 'black', 'red', 'yellow']} len={160} w={180} />
         <Kicker>Pod Architecture</Kicker>
         <h1 className="h1">Seventeen subsystems in a lunch-tin-sized box.</h1>
         <p className="lede">Pick a part. The camera flies to it and everything else turns to glass.</p>
@@ -102,7 +100,6 @@ export default function PodArch() {
       <section className="wrap section xs-wrap">
         <Reveal><Kicker>Cross-section</Kicker><h2 className="h2">How the layers stack.</h2></Reveal>
         <div className="xs-grid">
-          <Sci kind="wire" tag="A" label="Wireframe" className="xs-sci" scale={3.3} />
           <CrossSection />
         </div>
       </section>

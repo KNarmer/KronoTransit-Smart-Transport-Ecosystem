@@ -4,11 +4,20 @@ import { AnimatePresence, MotionConfig, motion } from 'framer-motion';
 import { ease } from './motion.js';
 import { TopBar, Footer, RouteScan } from './components/Shell.jsx';
 import Overview from './pages/Overview.jsx';
+import SideRigs from './components/SideRigs.jsx';
 
 const PodArch = lazy(() => import('./pages/PodArch.jsx'));
 const LabReports = lazy(() => import('./pages/LabReports.jsx'));
 const Engineering = lazy(() => import('./pages/Engineering.jsx'));
 const Grants = lazy(() => import('./pages/Grants.jsx'));
+
+const RIGS = {
+  '/': ['lsm6', 'rtc', 'bme', 'gauge'],
+  '/pod': ['nfc', 'h3lis', 'core', 'boost'],
+  '/lab-reports': ['as7341', 'rtc', 'magDock', 'lsm6'],
+  '/engineering': ['pp1', 'gauge', 'pp2', 'chg'],
+  '/grants': ['h3lis', 'as7341', 'bme', 'nfc'],
+};
 
 export default function App() {
   const location = useLocation();
@@ -16,6 +25,7 @@ export default function App() {
     <MotionConfig reducedMotion="user" transition={{ ease }}>
       <TopBar />
       <RouteScan />
+      <SideRigs key={location.pathname} ids={RIGS[location.pathname] || RIGS['/']} heroHeight={location.pathname === '/' ? window.innerHeight : 0} />
       <AnimatePresence mode="wait" initial={false} onExitComplete={() => window.scrollTo(0, 0)}>
         <motion.main
           key={location.pathname}

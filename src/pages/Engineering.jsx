@@ -5,7 +5,9 @@ import BusExplorer from '../components/BusExplorer.jsx';
 import CostExplorer from '../components/CostExplorer.jsx';
 import { Reveal, Kicker } from '../components/Bits.jsx';
 import { Hang, Peek, hw, Bench } from '../components/Rig.jsx';
-import Sci from '../components/Sci.jsx';
+import { lazy, Suspense } from 'react';
+import HardwareExplorer from '../components/HardwareExplorer.jsx';
+const BoardViewer = lazy(() => import('../components/BoardViewer.jsx'));
 
 const RAILS = [
   ['VBAT', '3.0–4.2 V', 'LiPo through the fuel gauge', '≈0.20 A worst case'],
@@ -24,26 +26,17 @@ export default function Engineering() {
   return (
     <>
       <section className="wrap lead-block lead-split">
-        <Hang id="pp1" className="rig-top" colors={['red', 'black', 'yellow', 'blue']} len={160} w={190} rot={6} />
         <div>
           <Kicker>Engineering & BOM</Kicker>
           <h1 className="h1">Every board, every wire, every dollar.</h1>
           <p className="lede">Off-the-shelf boards today, one custom PCB tomorrow.</p>
         </div>
-        <Sci kind="wire" tag="E" label="Wireframe · drag to rotate" scale={4} />
+        <figure className="lead-board"><Suspense fallback={null}><BoardViewer id="dk" spin={1} zoom={false} /></Suspense><figcaption className="mono">nRF5340 development kit — the brain · drag me</figcaption></figure>
       </section>
 
       <section className="wrap section gallery-wrap">
-        <Reveal><Kicker>The parts</Kicker><h2 className="h2">Meet the hardware.</h2></Reveal>
-        <ul className="gallery">
-          {gallery.map((c, i) => (
-            <Reveal as="li" key={c.id} delay={(i % 4) * 0.05} className="gal">
-              <div className="gal-img"><img src={hw(c.img)} alt="" loading="lazy" /></div>
-              <h3 className="h4">{c.name}</h3>
-              <p>{c.role.split('.')[0]}.</p>
-            </Reveal>
-          ))}
-        </ul>
+        <Reveal><Kicker>The parts</Kicker><h2 className="h2">Meet the hardware. Pick one up.</h2></Reveal>
+        <HardwareExplorer />
         <details className="more">
           <summary>Full specification table, with sources</summary>
           <ProvKey />

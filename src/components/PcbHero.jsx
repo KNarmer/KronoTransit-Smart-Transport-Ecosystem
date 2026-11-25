@@ -25,6 +25,7 @@ export default function PcbHero() { // now the 'What's inside' circuit section
 
   return (
     <section className="hero circuit">
+      <div className="pcb-wrap">
       <svg className="pcb" viewBox="-60 -20 1720 1040" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
         <defs>
           <pattern id="vias" width="40" height="40" patternUnits="userSpaceOnUse"><circle cx="20" cy="20" r="1.1" className="via" /></pattern>
@@ -59,14 +60,14 @@ export default function PcbHero() { // now the 'What's inside' circuit section
             </g>
           );
         })}
-        <text x="1108" y="700" textAnchor="middle" className="pcb-ref">U1 · nRF5340 · edge model + signing</text>
       </svg>
 
       {active && (
-        <div className="hero-tip" style={{ left: `${(active[3] / 1600) * 100}%`, top: `${(active[4] / 1000) * 100}%` }} aria-hidden="true">
+        <div className="hero-tip" style={{ left: `${((active[3] + 60) / 1720) * 100}%`, top: `${((active[4] + 20) / 1040) * 100}%` }} aria-hidden="true">
           <b>{active[1]}</b><span>{active[2]}</span>
         </div>
       )}
+      </div>
 
       <div className="hero-copy">
         <p className="hero-k mono">What’s inside</p>
