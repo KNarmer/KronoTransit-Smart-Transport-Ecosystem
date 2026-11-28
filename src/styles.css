@@ -1131,8 +1131,6 @@ em, i, cite, blockquote, .student-line, .foot-tag, .h1 em { font-style: normal !
 }
 
 /* living background + breathing hardware */
-.ambient { position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.55; }
-:root[data-theme='light'] .ambient { opacity: 0.4; }
 .rig image, .srig image { animation: board-breathe 5.5s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 50%; }
 .rig image:nth-of-type(2n), .srig:nth-child(2n) image { animation-duration: 7s; animation-delay: -2s; }
 .rig image:nth-of-type(3n), .srig:nth-child(3n) image { animation-duration: 6.2s; animation-delay: -3.4s; }

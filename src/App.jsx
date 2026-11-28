@@ -5,7 +5,6 @@ import { ease } from './motion.js';
 import { TopBar, Footer, RouteScan } from './components/Shell.jsx';
 import Overview from './pages/Overview.jsx';
 import SideRigs from './components/SideRigs.jsx';
-import Ambient from './components/Ambient.jsx';
 
 const Why = lazy(() => import('./pages/Why.jsx'));
 const PodArch = lazy(() => import('./pages/PodArch.jsx'));
@@ -28,7 +27,6 @@ export default function App() {
     <MotionConfig reducedMotion="user" transition={{ ease }}>
       <TopBar />
       <RouteScan />
-      <Ambient />
       <SideRigs key={location.pathname} ids={RIGS[location.pathname] || RIGS['/']} heroHeight={location.pathname === '/' ? window.innerHeight : 0} />
       <AnimatePresence mode="wait" initial={false} onExitComplete={() => window.scrollTo(0, 0)}>
         <motion.main
