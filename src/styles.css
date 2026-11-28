@@ -1155,3 +1155,9 @@ em, i, cite, blockquote, .student-line, .foot-tag, .h1 em { font-style: normal !
 .t-center .path::after { display: none; }
 .t-center .path li:not(.now) { opacity: 0.75; }
 @media (max-width: 640px) { .t-center .path { grid-template-columns: 1fr; } }
+.t-center .founders { justify-content: center; text-align: center; }
+.t-center .founder-photo { margin-inline: auto; }
+.founder-photo { aspect-ratio: 4 / 5; max-width: 280px; overflow: hidden; }
+.founder-photo img { object-position: 50% 20%; display: block; }
+.founder-role:empty, .founder-bio:empty { display: none; }
+.t-center > .note { text-align: center; }

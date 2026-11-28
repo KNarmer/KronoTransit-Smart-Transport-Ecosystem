@@ -29,8 +29,8 @@ const UNLOCKS = [
 
 const FOUNDERS = [
   // Fill these in when ready: { name, role, bio, photo: 'founders/naitik.jpg' }
-  { name: 'Naitik Patel', role: '', bio: '', photo: '' },
-  { name: 'Deeptanava Roy', role: '', bio: '', photo: '' },
+  { name: 'Naitik Patel', role: '', bio: '', photo: 'founders/naitik.webp' },
+  { name: 'Deeptanava Roy', role: '', bio: '', photo: 'founders/deeptanava.webp' },
 ];
 
 function Port({ code, title, text, subject, i }) {
@@ -92,7 +92,7 @@ export default function Grants() {
         <div className="founders">
           {FOUNDERS.map((p, i) => (
             <Reveal key={p.name} delay={i * 0.06} className="founder">
-              <div className="founder-photo">{p.photo ? <img src={`${import.meta.env.BASE_URL}${p.photo}`} alt={p.name} /> : <span aria-hidden="true" />}</div>
+              <div className="founder-photo">{p.photo ? <img src={`${import.meta.env.BASE_URL}${p.photo}`} alt={p.name} loading="lazy" width="640" height="800" /> : <span aria-hidden="true" />}</div>
               <h3 className="h3">{p.name}</h3>
               <p className="founder-role">{p.role}</p>
               <p className="founder-bio">{p.bio}</p>
