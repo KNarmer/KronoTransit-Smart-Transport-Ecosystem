@@ -97,8 +97,8 @@ export default function PodArch() {
           ))}
         </nav>
       </section>
-      <section className="wrap section xs-wrap">
-        <Reveal><Kicker>Cross-section</Kicker><h2 className="h2">How the layers stack.</h2></Reveal>
+      <section className="wrap section xs-wrap t-right">
+        <Reveal className="sec-intro"><Kicker>Section A–A</Kicker><h2 className="h2">Foam, vial, sensors, battery. In that order.</h2></Reveal>
         <div className="xs-full">
           <CrossSection />
         </div>

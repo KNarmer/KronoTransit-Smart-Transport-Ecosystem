@@ -10,7 +10,6 @@ import { Reveal, Kicker } from '../components/Bits.jsx';
 import { Rig, Hang, Peek, Bench } from '../components/Rig.jsx';
 import Telemetry from '../components/Telemetry.jsx';
 import InAction from '../components/InAction.jsx';
-import { StakesBanner } from '../components/WhyParts.jsx';
 
 const PodViewer = lazy(() => import('../components/PodViewer.jsx'));
 
@@ -48,6 +47,9 @@ export default function Overview() {
             <Link to="/pod" className="go go-strong">Take it apart <span>→</span></Link>
             <Link to="/lab-reports" className="go">See a lab report <span>→</span></Link>
           </div>
+          <Link to="/why" className="hero-fact">
+            <b>46–68%</b><span>of lab errors happen before the sample is ever tested. Why that matters</span><i aria-hidden="true">→</i>
+          </Link>
         </div>
 
         <figure className="scope">
@@ -64,34 +66,34 @@ export default function Overview() {
         </figure>
       </section>
 
-      <StakesBanner compact />
       <Telemetry />
       <PcbHero />
 
       <section className="section journey-wrap">
-        <div className="wrap"><Reveal><Kicker>The journey</Kicker><h2 className="h2">Ward to lab, every second on record.</h2></Reveal></div>
+        <div className="wrap"><Reveal><Kicker>Theatre → histology</Kicker><h2 className="h2">Ward to lab, every second on record.</h2></Reveal></div>
         <Journey />
       </section>
 
-      <section className="wrap section wit-wrap">
+      <section className="wrap section wit-wrap t-center">
         <Reveal className="sec-intro">
-          <Kicker>Five witnesses</Kicker>
+          <Kicker>Sensor fusion</Kicker>
           <h2 className="h2">Shake it. Bake it. Open it. Fly it.</h2>
           <p className="body">Pick an event. Watch all five react.</p>
         </Reveal>
         <Witnesses />
       </section>
 
-      <section className="wrap section">
-        <Reveal><Kicker>Inside, in action</Kicker><h2 className="h2">Switch it on. See what each part is doing.</h2></Reveal>
+      <section className="wrap section t-right">
+        <Reveal className="sec-intro"><Kicker>Live subsystems</Kicker><h2 className="h2">Switch it on. Watch each subsystem work.</h2></Reveal>
         <InAction />
       </section>
 
       <section className="wrap section student">
         <Reveal>
           <p className="student-line">Designed, wired and coded by high school students.</p>
+          <p className="student-sub">A student research project, not a product. Nothing is for sale and no pilots are planned.</p>
           <div className="hero-links center">
-            <Link className="go go-strong" to="/grants">Help us pilot it <span>→</span></Link>
+            <Link className="go go-strong" to="/grants">Back the bench build <span>→</span></Link>
             <Link className="go" to="/why">Why it matters <span>→</span></Link>
             <Link className="go" to="/engineering">See the engineering <span>→</span></Link>
           </div>

@@ -165,26 +165,33 @@ export default function InAction() {
               </button>
             </motion.div>
           ) : (
-            <motion.div key="on" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4, ease }}>
-              <div className="ia-tabs" role="tablist">
+            <motion.div key="on" className="ia-on" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4, ease }}>
+              <div className="ia-rail" role="tablist" aria-orientation="vertical" aria-label="Subsystems">
+                <p className="ia-rail-h mono">Channels · {seen.size}/5</p>
                 {SUBS.map((s, i) => (
-                  <button key={s.id} role="tab" aria-selected={sel === s.id} className={`ia-tab ${sel === s.id ? 'on' : ''} ${seen.has(s.id) ? 'seen' : ''}`} onClick={() => pick(s)}>
-                    <span className="mono">{seen.has(s.id) ? '✓' : String(i + 1).padStart(2, '0')}</span>{s.name}
+                  <button key={s.id} role="tab" aria-selected={sel === s.id} className={`ia-ch ${sel === s.id ? 'on' : ''} ${seen.has(s.id) ? 'seen' : ''}`} onClick={() => pick(s)}>
+                    <i className="ia-led" aria-hidden="true" />
+                    <span className="ia-ch-n">{s.name}</span>
+                    <span className="ia-ch-v mono">CH{i + 1} · {s.verb}</span>
                   </button>
                 ))}
               </div>
-              <AnimatePresence mode="wait">
-                {S ? (
-                  <motion.div key={S.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, transition: { duration: 0.12 } }} transition={{ duration: 0.35, ease }}>
-                    <p className="ia-verb mono">{S.verb}</p>
-                    <V />
-                    <p className="ia-text">{S.text}</p>
-                  </motion.div>
-                ) : (
-                  <motion.p key="pick" className="ia-pick" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>Pick a subsystem. Five to find.</motion.p>
-                )}
-              </AnimatePresence>
-              <p className="ia-count mono">{seen.size} / 5 explored{seen.size === 5 ? ' — you’ve seen the whole pod.' : ''}</p>
+              <div className="ia-view">
+                <AnimatePresence mode="wait">
+                  {S ? (
+                    <motion.div key={S.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, transition: { duration: 0.12 } }} transition={{ duration: 0.35, ease }}>
+                      <V />
+                      <p className="ia-text">{S.text}</p>
+                    </motion.div>
+                  ) : (
+                    <motion.div key="pick" className="ia-pick" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                      <svg viewBox="0 0 60 24" width="60" height="24" aria-hidden="true"><path d="M58 12 H8 M16 4 L8 12 L16 20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                      <p>Pick a channel. Five to find.</p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+                {seen.size === 5 && <p className="ia-count mono">All five channels seen.</p>}
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

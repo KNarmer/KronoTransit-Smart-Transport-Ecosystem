@@ -35,7 +35,7 @@ export default function Engineering() {
       </section>
 
       <section className="wrap section gallery-wrap">
-        <Reveal><Kicker>The parts</Kicker><h2 className="h2">Meet the hardware. Pick one up.</h2></Reveal>
+        <Reveal><Kicker>Board by board</Kicker><h2 className="h2">Pick a board up. Pull it out. See what breaks.</h2></Reveal>
         <HardwareExplorer />
         <details className="more">
           <summary>Full specification table, with sources</summary>
@@ -59,8 +59,8 @@ export default function Engineering() {
         </details>
       </section>
 
-      <section className="wrap section bus-wrap">
-        <Reveal><Kicker>Wiring</Kicker><h2 className="h2">Follow any wire.</h2></Reveal>
+      <section className="wrap section bus-wrap t-right">
+        <Reveal className="sec-intro"><Kicker>I²C · SPI · GPIO</Kicker><h2 className="h2">Follow any wire.</h2></Reveal>
         <BusExplorer />
         <details className="more">
           <summary>Power rails and design decisions</summary>
@@ -76,13 +76,13 @@ export default function Engineering() {
         </details>
       </section>
 
-      <section className="wrap section">
-        <Reveal><Kicker>The plan</Kicker><h2 className="h2">Build it. Pilot it. Fix it. Ship it.</h2></Reveal>
+      <section className="wrap section t-center">
+        <Reveal className="sec-intro"><Kicker>Roadmap</Kicker><h2 className="h2">On the bench now. The rest is future work.</h2></Reveal>
         <ol className="path">
           {STAGES.map(([h, , cost, k], i) => (
             <Reveal as="li" key={h} delay={i * 0.05} className={i === 0 ? 'now' : ''}>
               <span className="path-dot" />
-              <span className="mono">{i === 0 ? 'We are here' : `Step ${i + 1}`}</span>
+              <span className="mono">{i === 0 ? 'We are here' : i === 1 ? 'Next, if funded' : 'Future direction'}</span>
               <h3 className="h4">{h}</h3>
               <p className="path-cost">{cost}</p>
             </Reveal>
@@ -91,7 +91,7 @@ export default function Engineering() {
       </section>
 
       <section className="wrap section cost-wrap">
-        <Reveal><Kicker>Cost</Kicker><h2 className="h2">One pod at 1, 50 and 1,000.</h2></Reveal>
+        <Reveal><Kicker>Bill of materials</Kicker><h2 className="h2">One pod at 1, 50 and 1,000.</h2></Reveal>
         <CostExplorer />
       </section>
       <Bench ids={['chg', 'gauge', 'pp2', 'boost', 'bat']} />

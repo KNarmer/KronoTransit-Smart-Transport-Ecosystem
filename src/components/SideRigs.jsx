@@ -1,7 +1,8 @@
-// Boards hanging in the empty side margins. They swing with scroll speed (spring-damped) and
-// only appear when the margin is wide enough to hold them without touching content.
-import { useEffect, useState } from 'react';
-import { motion, useScroll, useSpring, useTransform, useVelocity } from 'framer-motion';
+// Boards hanging in the empty side margins. Each one is a slow, lightly damped pendulum: it drifts
+// in its own gentle "air" (two slow sines with random phases) and lags behind scrolling like a weight
+// on a rope. They only appear when the margin is wide enough to hold them without touching content.
+import { useEffect, useMemo, useState } from 'react';
+import { motion, useMotionValue, useScroll, useTransform } from 'framer-motion';
 import { hw, ASPECT, WIRE } from './Rig.jsx';
 
 const CONTENT = 1340;
@@ -9,8 +10,29 @@ const COLORS = [['red', 'black', 'yellow'], ['blue', 'white', 'green'], ['orange
 
 function Swing({ id, x, len, w, k, colors, hideUntil = 0 }) {
   const { scrollY } = useScroll();
-  const vel = useVelocity(scrollY);
-  const swing = useSpring(useTransform(vel, [-3000, 0, 3000], [16 * k, 0, -16 * k]), { stiffness: 60, damping: 6, mass: 1 });
+  const swing = useMotionValue(0);
+  // per-rig character: natural period 5–8 s, its own drift
+  const p = useMemo(() => ({ T: 5 + Math.random() * 3, a1: 0.5 + Math.random() * 0.6, a2: 0.2 + Math.random() * 0.35, f1: 0.07 + Math.random() * 0.05, f2: 0.17 + Math.random() * 0.08, ph1: Math.random() * 6.28, ph2: Math.random() * 6.28 }), []);
+  useEffect(() => {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const w0 = (2 * Math.PI) / p.T, damp = 0.22;
+    let th = 0, om = 0, raf = 0, last = performance.now(), lastY = window.scrollY, v = 0;
+    const step = (now) => {
+      const dt = Math.min(0.05, (now - last) / 1000); last = now;
+      const y = window.scrollY; const vNow = dt > 0 ? (y - lastY) / dt : 0; lastY = y;
+      v += (vNow - v) * Math.min(1, dt * 6); // smoothed scroll speed, px/s
+      const t = now / 1000;
+      const air = p.a1 * Math.sin(t * p.f1 * 6.28 + p.ph1) + p.a2 * Math.sin(t * p.f2 * 6.28 + p.ph2);
+      const drag = Math.max(-3, Math.min(3, -v * 0.0011 * k)); // degrees, at most 3°
+      const target = air + drag;
+      om += (-w0 * w0 * (th - target) - damp * om) * dt;
+      th += om * dt;
+      swing.set(th);
+      raf = requestAnimationFrame(step);
+    };
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
+  }, [p, k, swing]);
   const drop = useTransform(scrollY, [hideUntil * 0.6, hideUntil], [-len - 260, 0]);
   const h = w * (ASPECT[id] || 0.8);
   const n = colors.length;

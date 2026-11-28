@@ -52,8 +52,8 @@ export const TIERS = [
     ],
   },
   {
-    id: 'pilot', name: 'Clinical pilot batch', qty: 50, prov: 'est',
-    blurb: 'A first custom-PCB batch for pilot sites: chips bought at small-batch prices, enclosures printed, hand assembly.',
+    id: 'pilot', name: 'Small test batch', qty: 50, prov: 'est',
+    blurb: 'A hypothetical first custom-PCB batch for more bench testing: chips at small-batch prices, printed enclosures, hand assembly.',
     unit: { pcba: 83.7, sensors: 44.7, thermal: 12, enclosure: 35, labor: 50, qa: 45 },
     notes: [
       ['est', 'Chips and sensors at ≈1.3× the ~1,000-unit prices below (small-batch distributor pricing).'],
@@ -64,7 +64,7 @@ export const TIERS = [
   },
   {
     id: 'scale', name: 'Scaled production', qty: 1000, prov: 'est',
-    blurb: 'Custom PCB at roughly 1,000 units with a moulded enclosure: the project’s production cost target of ≈ $135 per pod.',
+    blurb: 'A what-if: custom PCB at roughly 1,000 units with a moulded enclosure, ≈ $135 per pod. An engineering exercise, not a plan to manufacture.',
     unit: { pcba: 51.6, sensors: 34.4, thermal: 8, enclosure: 26, labor: 15, qa: 0 },
     notes: [
       ['est', 'PCBA: nRF5340 $12.50, 64 MB flash $1.10, secure element ≈$1, battery/charger/gauge ≈$8, regulators + passives ≈$6, NFC front-end ≈$5, 4-layer PCB + assembly ≈$18.'],
@@ -86,7 +86,5 @@ export const CARTRIDGE = [
 export const STAGES = [
   ['Develop', 'Prototype working end to end; calibrate against reference instruments with labelled heat, cold, drop and tube runs.', '≈ $500 parts', 'quote'],
   ['Engineering validation', 'Two custom PCB spins, enclosure prototypes, a reference thermometer, test fixtures and ten pods.', '$8,000–10,000', 'est'],
-  ['Hospital & lab pilots', 'Twenty pods at partner sites, route-validation studies, integration engineering, insurance.', '$40,000–80,000', 'est'],
-  ['Refine', 'Fold pilot feedback into hardware, firmware and the report format.', 'Depends on pilot findings', 'est'],
-  ['Market', 'Device-as-a-service: pods and docks per month, cartridges per use.', '$75–95 per pod per month (target)', 'est'],
+  ['Clinical study', 'Only with a hospital partner and ethics review. Not planned.', 'Not costed', 'est'],
 ];

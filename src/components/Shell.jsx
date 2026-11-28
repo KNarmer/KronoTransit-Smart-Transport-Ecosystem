@@ -75,7 +75,7 @@ export function Footer() {
       <div className="foot-brand"><Mark size={26} /><Wordmark /></div>
       <p className="foot-tag">{TAGLINE}</p>
       <Pulse className="foot-pulse" width={180} />
-      <p className="foot-meta">A student-led biomedical engineering project by high school students. Open source under Apache 2.0 · <a href={REPO} target="_blank" rel="noreferrer">source</a></p>
+      <p className="foot-meta">A student research project by high school students. Not a commercial product. Open source under Apache 2.0 · <a href={REPO} target="_blank" rel="noreferrer">source</a></p>
     </footer>
   );
 }

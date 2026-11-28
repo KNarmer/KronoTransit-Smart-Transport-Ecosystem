@@ -16,7 +16,7 @@ const contact = (subject) => (CONTACT_EMAIL
 
 const PORTS = [
   ['GRANT', 'Grant makers & funders', 'Fund engineering validation: two custom PCB spins, enclosure prototypes, a reference thermometer and ten pods.', 'Grant enquiry: KronoTransit'],
-  ['LAB', 'Hospitals & laboratories', 'Host a pilot. We’ll start with tube-route validation, which needs no cartridges and no hospital IT integration.', 'Pilot enquiry: KronoTransit'],
+  ['LAB', 'Clinicians & lab staff', 'Tell us how specimens really move in your hospital. Twenty minutes of advice shapes our bench tests.', 'Clinical advice: KronoTransit'],
   ['RES', 'Researchers', 'Help us design honest calibration and validation studies, from haemolysis to tissue decay markers.', 'Research collaboration: KronoTransit'],
   ['MENT', 'Mentors & engineers', 'Review our hardware, firmware or data pipeline. Office hours, a design review or a lab bench all help.', 'Mentorship: KronoTransit'],
   ['MAKE', 'Makers & suppliers', 'Sensors, enclosures, PCB fabrication or test equipment at student-project rates.', 'Supplier / maker: KronoTransit'],
@@ -25,7 +25,6 @@ const PORTS = [
 const UNLOCKS = [
   ['$500', 'finishes the working prototype', 'quote'],
   ['$8–10k', 'engineering validation: custom PCBs and ten pods', 'est'],
-  ['$40–80k', 'a hospital and laboratory pilot with twenty pods', 'est'],
 ];
 
 const FOUNDERS = [
@@ -65,20 +64,20 @@ export default function Grants() {
         <div>
           <Kicker>Grants & Team</Kicker>
           <h1 className="h1">We’ve got the wiring. <em>Got a power supply?</em></h1>
-          <p className="lede">High school students looking for grants, pilot sites and mentors. No funding yet — that’s what this page is for.</p>
+          <p className="lede">High school students looking for grants, mentors and advice. This is a student project, not a company: nothing is for sale and no pilots are planned.</p>
         </div>
         <figure className="lead-board"><Suspense fallback={null}><BoardViewer id="bat" spin={2} zoom={false} /></Suspense><figcaption className="mono">Our current power supply. 2,500 mAh. Help us upgrade · drag me</figcaption></figure>
       </section>
 
       <section className="wrap section ports-wrap">
-        <Reveal><Kicker>Plug in</Kicker><h2 className="h2">Five ways to connect.</h2></Reveal>
+        <Reveal><Kicker>Open ports</Kicker><h2 className="h2">Five ways to plug into the project.</h2></Reveal>
         <ul className="ports">
           {PORTS.map(([code, title, text, subject], i) => <Port key={code} code={code} title={title} text={text} subject={subject} i={i} />)}
         </ul>
       </section>
 
-      <section className="wrap section unlocks">
-        <Reveal><Kicker>What funding unlocks</Kicker><h2 className="h2">Small numbers, large steps.</h2></Reveal>
+      <section className="wrap section unlocks t-right">
+        <Reveal className="sec-intro"><Kicker>Budget</Kicker><h2 className="h2">$500 finishes the prototype.</h2></Reveal>
         <ol>
           {UNLOCKS.map(([v, t, k], i) => (
             <Reveal as="li" key={v} delay={i * 0.06}>
@@ -88,8 +87,8 @@ export default function Grants() {
         </ol>
       </section>
 
-      <section className="wrap section">
-        <Reveal><Kicker>Meet the founders</Kicker><h2 className="h2">The people behind the pod.</h2></Reveal>
+      <section className="wrap section t-center">
+        <Reveal className="sec-intro"><Kicker>Team</Kicker><h2 className="h2">Two students, one bench.</h2></Reveal>
         <div className="founders">
           {FOUNDERS.map((p, i) => (
             <Reveal key={p.name} delay={i * 0.06} className="founder">
