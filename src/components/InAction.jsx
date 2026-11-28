@@ -143,14 +143,21 @@ export default function InAction() {
   const [sel, setSel] = useState(null);
   const [seen, setSeen] = useState(() => new Set());
   const onReady = useCallback(() => setReady(true), []);
+  // Don't spin up a second WebGL view until the section is about to scroll into view.
+  const box = useRef(null);
+  const [near, setNear] = useState(false);
+  useEffect(() => {
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setNear(true); io.disconnect(); } }, { rootMargin: '700px 0px' });
+    io.observe(box.current); return () => io.disconnect();
+  }, []);
   const pick = (s) => { setSel(s.id); setSeen((x) => new Set(x).add(s.id)); api.current?.select(s.match); };
   const S = SUBS.find((s) => s.id === sel);
   const V = sel ? VIEW[sel] : null;
 
   return (
     <div className={`ia ${on ? 'is-on' : ''}`}>
-      <div className="ia-3d">
-        <Suspense fallback={null}><PodViewer apiRef={api} onReady={onReady} spin={0.6} autoRotate /></Suspense>
+      <div className="ia-3d" ref={box}>
+        {near && <Suspense fallback={null}><PodViewer apiRef={api} onReady={onReady} spin={0.6} autoRotate /></Suspense>}
         {!ready && <p className="ia-wait mono">Loading pod…</p>}
       </div>
 

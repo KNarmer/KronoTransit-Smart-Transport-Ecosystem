@@ -5,10 +5,12 @@
 import { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
-import { POD_GLB, DRACO } from './model.js';
+import { POD_GLB } from './model.js';
+import { cloneScene, disposeOwned } from './gltfCache.js';
+
+// Start downloading and decoding the pod as soon as this chunk arrives.
+cloneScene(POD_GLB).catch(() => {});
 
 const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
@@ -18,13 +20,21 @@ export default function PodViewer({ onReady, onPick, onHover, apiRef, startExplo
   useEffect(() => {
     const wrap = wrapRef.current;
     const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, logarithmicDepthBuffer: true, powerPreference: 'high-performance' });
+    // No logarithmic depth buffer: with near/far at 0.3/300 the standard buffer resolves every layer,
+    // and log depth disables early-z, roughly doubling the cost of each frame.
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: 'high-performance' });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.1;
+    // The two glass materials are fully frosted (roughness 1), so they sample the blurriest mip of the
+    // transmission pass. Rendering that pass at a third of the size is pixel-identical and far cheaper.
+    renderer.transmissionResolutionScale = 0.33;
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    // The light is fixed and orbiting only moves the camera, so the 4K shadow map is redrawn only
+    // when parts actually move (explode) or change opacity (ghosting), not every frame.
+    renderer.shadowMap.autoUpdate = false;
     wrap.appendChild(renderer.domElement);
     const aniso = renderer.capabilities.getMaxAnisotropy();
 
@@ -51,6 +61,10 @@ export default function PodViewer({ onReady, onPick, onHover, apiRef, startExplo
     controls.minPolarAngle = 0.25; controls.maxPolarAngle = 1.45;
     controls.autoRotate = autoRotate && !reduce; controls.autoRotateSpeed = spin;
     controls.addEventListener('start', () => { controls.autoRotate = false; });
+    // Draw only when something changed: the camera moved, parts moved, or the hover state changed.
+    let dirty = true;
+    const redraw = (shadows = false) => { dirty = true; if (shadows) renderer.shadowMap.needsUpdate = true; };
+    controls.addEventListener('change', () => redraw());
 
     const parts = []; // { node, label, base: Vector3, off: Vector3, meshes: Mesh[] }
     let wiresA = null, wiresE = null, model = null, unit = 1, home = null, disposed = false;
@@ -82,6 +96,7 @@ export default function PodViewer({ onReady, onPick, onHover, apiRef, startExplo
       }
       if (wiresA) wiresA.traverse((o) => o.isMesh && setGhost(o, !!selected));
       if (wiresE) wiresE.traverse((o) => o.isMesh && setGhost(o, !!selected));
+      redraw();
     };
 
     const frame = (meshes, dur = 1.1) => {
@@ -99,10 +114,9 @@ export default function PodViewer({ onReady, onPick, onHover, apiRef, startExplo
       cam = { t: 0, dur, p0: camera.position.clone(), t0: controls.target.clone(), p1: c.clone().addScaledVector(dir, dist).add(shift), t1 };
     };
 
-    const draco = new DRACOLoader().setDecoderPath(DRACO);
-    new GLTFLoader().setDRACOLoader(draco).load(POD_GLB, (gltf) => {
+    cloneScene(POD_GLB).then((root) => {
       if (disposed) return;
-      model = gltf.scene;
+      model = root;
       model.rotation.y = -0.45;
       model.updateMatrixWorld(true);
       // Scale on the exploded footprint so both states fit.
@@ -124,7 +138,7 @@ export default function PodViewer({ onReady, onPick, onHover, apiRef, startExplo
       model.traverse((o) => {
         if (o.isMesh) {
           o.castShadow = true; o.receiveShadow = true;
-          o.material = o.material.clone();
+          o.material = o.material.clone(); o.material.userData.owned = true;
           for (const k of ['map', 'normalMap', 'roughnessMap', 'metalnessMap', 'emissiveMap']) if (o.material[k]) o.material[k].anisotropy = aniso;
           if (o.material.transparent || o.material.alphaTest > 0) { o.material.polygonOffset = true; o.material.polygonOffsetFactor = -2; o.material.polygonOffsetUnits = -2; }
         }
@@ -148,6 +162,7 @@ export default function PodViewer({ onReady, onPick, onHover, apiRef, startExplo
       else { controls.target.set(0, hgt * 0.3, 0); camera.position.set(4.5 * near, 4.2 * near, 10.5 * near); }
       controls.update();
       home = { p: camera.position.clone(), t: controls.target.clone() };
+      redraw(true);
       onReady?.(parts.map((p) => p.label));
       // Hero: open the pod up in front of the visitor.
       if (startExploded) setTimeout(() => { explodeTo = 1; }, 500);
@@ -201,11 +216,12 @@ export default function PodViewer({ onReady, onPick, onHover, apiRef, startExplo
       const w = wrap.clientWidth, h = wrap.clientHeight; if (!w || !h) return;
       renderer.setSize(w, h, false); el.style.width = '100%'; el.style.height = '100%';
       camera.aspect = w / h; camera.fov = w / h < 1 ? 42 : 30; camera.updateProjectionMatrix();
+      redraw();
     };
     const ro = new ResizeObserver(resize); ro.observe(wrap); resize();
 
     let raf = 0, visible = true, last = performance.now();
-    const io = new IntersectionObserver(([en]) => { visible = en.isIntersecting; if (visible && !raf) { last = performance.now(); raf = requestAnimationFrame(tick); } });
+    const io = new IntersectionObserver(([en]) => { visible = en.isIntersecting; if (visible) dirty = true; if (visible && !raf) { last = performance.now(); raf = requestAnimationFrame(tick); } });
     io.observe(wrap);
 
     function tick(now) {
@@ -220,6 +236,7 @@ export default function PodViewer({ onReady, onPick, onHover, apiRef, startExplo
         if (wiresA) wiresA.visible = k < 0.5;
         if (wiresE) wiresE.visible = k >= 0.5;
         if (explode === explodeTo && selected) frame(selected.meshes, 0.8);
+        redraw(true);
       }
       if (cam) {
         cam.t = Math.min(1, cam.t + (reduce ? 1 : dt / cam.dur));
@@ -227,6 +244,7 @@ export default function PodViewer({ onReady, onPick, onHover, apiRef, startExplo
         camera.position.lerpVectors(cam.p0, cam.p1, k);
         controls.target.lerpVectors(cam.t0, cam.t1, k);
         if (cam.t >= 1) cam = null;
+        redraw();
       }
       controls.update();
       if (pending && model && ptr.ex) {
@@ -234,7 +252,7 @@ export default function PodViewer({ onReady, onPick, onHover, apiRef, startExplo
         const p = pick(ptr.ex);
         if (p !== hovered) { hovered = p; paint(); onHover?.(p ? p.label : null); el.style.cursor = p ? 'pointer' : ''; }
       }
-      renderer.render(scene, camera);
+      if (dirty) { dirty = false; renderer.render(scene, camera); }
       raf = requestAnimationFrame(tick);
     }
     raf = requestAnimationFrame(tick);
@@ -243,11 +261,9 @@ export default function PodViewer({ onReady, onPick, onHover, apiRef, startExplo
       disposed = true; cancelAnimationFrame(raf); io.disconnect(); ro.disconnect();
       el.removeEventListener('pointermove', onMove); el.removeEventListener('pointerdown', onDown);
       el.removeEventListener('pointerup', onUp); el.removeEventListener('pointerleave', onLeave);
-      controls.dispose(); draco.dispose(); pmrem.dispose();
-      scene.traverse((o) => {
-        if (o.geometry) o.geometry.dispose();
-        if (o.material) (Array.isArray(o.material) ? o.material : [o.material]).forEach((m) => { for (const k in m) if (m[k]?.isTexture) m[k].dispose(); m.dispose(); });
-      });
+      controls.dispose(); pmrem.dispose(); scene.environment?.dispose();
+      disposeOwned(model);
+      floor.geometry.dispose(); floor.material.dispose();
       renderer.dispose(); renderer.forceContextLoss();
       wrap.removeChild(el);
     };

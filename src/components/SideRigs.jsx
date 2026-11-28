@@ -50,7 +50,7 @@ function Swing({ id, x, len, w, k, colors, hideUntil = 0 }) {
             </g>
           );
         })}
-        <image href={hw(id)} x="0" y={len} width={w} height={h} style={{ filter: 'drop-shadow(0 12px 12px rgba(0,0,0,.45))' }} />
+        <image href={hw(id, true)} decoding="async" x="0" y={len} width={w} height={h} style={{ filter: 'drop-shadow(0 12px 12px rgba(0,0,0,.45))' }} />
       </svg>
     </motion.div>
   );

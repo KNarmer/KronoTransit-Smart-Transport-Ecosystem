@@ -5,7 +5,9 @@ import { useId } from 'react';
 import { motion } from 'framer-motion';
 
 const base = import.meta.env.BASE_URL;
-export const hw = (id) => `${base}hw/${id}.webp`;
+// Full 1400 px renders for large hero boards; 720 px copies (`sm`) wherever a board is drawn
+// under ~360 css px, which is still 2× on retina screens.
+export const hw = (id, sm = false) => `${base}hw/${sm ? 'sm/' : ''}${id}.webp`;
 export const ASPECT = { as7341: 0.832, bat: 0.729, bme: 0.832, boost: 0.909, chg: 0.842, core: 0.894, dk: 0.629, gauge: 0.97, h3lis: 0.838, lsm6: 0.721, magDock: 0.589, nfc: 0.803, pi: 0.651, pp1: 0.666, pp2: 0.695, rtc: 0.832 };
 
 export const WIRE = {
@@ -45,13 +47,13 @@ export function Wires({ wires, w = 5 }) {
 
 const PEEK = { left: { x: -80 }, right: { x: 80 }, top: { y: -80 }, bottom: { y: 80 } };
 
-export function Rig({ className = '', viewBox, wires = [], boards = [], w = 5, led, from, sway = false }) {
+export function Rig({ className = '', viewBox, wires = [], boards = [], w = 5, led, from, sway = false, sm = false }) {
   const fid = useId().replace(/:/g, '');
   const Board = (b) => {
     const h = b.w * (ASPECT[b.id] || 0.7);
     return (
       <g key={b.id + b.x} transform={`translate(${b.x} ${b.y}) rotate(${b.rot || 0})`} filter={`url(#s${fid})`}>
-        <image href={hw(b.id)} x={-b.w / 2} y={-h / 2} width={b.w} height={h} preserveAspectRatio="xMidYMid meet" />
+        <image href={hw(b.id, sm)} decoding="async" x={-b.w / 2} y={-h / 2} width={b.w} height={h} preserveAspectRatio="xMidYMid meet" />
       </g>
     );
   };
@@ -119,5 +121,5 @@ export function Bench({ ids, className = '' }) {
       wires.push({ from: [x0, y0], c1: [x0 + 50, y0 + 70 + k * 14], c2: [x1 - 50, y1 + 70 + k * 14], to: [x1, y1], color: colors[(i * 3 + k) % colors.length] });
     }
   }
-  return <Rig className={`bench ${className}`} viewBox="0 0 1600 300" boards={boards} wires={wires} w={4} />;
+  return <Rig className={`bench ${className}`} viewBox="0 0 1600 300" boards={boards} wires={wires} w={4} sm />;
 }

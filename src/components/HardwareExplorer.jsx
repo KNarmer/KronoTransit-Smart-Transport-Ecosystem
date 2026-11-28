@@ -69,7 +69,7 @@ export default function HardwareExplorer() {
           const cc = COMPONENTS.find((x) => x.id === comp);
           return (
             <button key={id} role="tab" aria-selected={sel === id} className={`hwx-chip ${sel === id ? 'on' : ''}`} onClick={() => pick(id)} title={cc.name}>
-              <img src={hw(id)} alt="" loading="lazy" />
+              <img src={hw(id, true)} decoding="async" alt="" loading="lazy" />
               <span>{cc.name.replace(' ×2', '')}</span>
             </button>
           );
