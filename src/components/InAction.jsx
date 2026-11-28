@@ -143,12 +143,17 @@ export default function InAction() {
   const [sel, setSel] = useState(null);
   const [seen, setSeen] = useState(() => new Set());
   const onReady = useCallback(() => setReady(true), []);
-  // Don't spin up a second WebGL view until the section is about to scroll into view.
+  // The second WebGL view waits until the hero is up, then warms up in the background.
   const box = useRef(null);
   const [near, setNear] = useState(false);
   useEffect(() => {
-    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setNear(true); io.disconnect(); } }, { rootMargin: '700px 0px' });
-    io.observe(box.current); return () => io.disconnect();
+    // Start it once the page is idle (so it is warmed up long before you scroll to it), or as soon
+    // as the section approaches, whichever comes first.
+    const go = () => setNear(true);
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) go(); }, { rootMargin: '1200px 0px' });
+    io.observe(box.current);
+    const idle = window.requestIdleCallback ? window.requestIdleCallback(go, { timeout: 3000 }) : setTimeout(go, 1500);
+    return () => { io.disconnect(); (window.cancelIdleCallback || clearTimeout)(idle); };
   }, []);
   const pick = (s) => { setSel(s.id); setSeen((x) => new Set(x).add(s.id)); api.current?.select(s.match); };
   const S = SUBS.find((s) => s.id === sel);

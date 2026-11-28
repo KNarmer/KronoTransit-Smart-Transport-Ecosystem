@@ -56,8 +56,11 @@ export default function BoardViewer({ id, spin = 1.2, zoom = true, className = '
         camera.position.set(dist * 0.45, dist * 0.65, dist * 0.62);
         controls.target.set(0, 0, 0); controls.minDistance = dist * 0.35; controls.maxDistance = dist * 1.8;
         controls.autoRotate = !reduce;
-        controls.update(); dirty = true;
-        onReady?.();
+        controls.update();
+        renderer.compileAsync(scene, camera).catch(() => {}).then(() => {
+          if (disposed || my !== token) return;
+          dirty = true; onReady?.();
+        });
       });
     };
     api.current = { show };

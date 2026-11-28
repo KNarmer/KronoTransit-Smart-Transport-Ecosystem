@@ -162,11 +162,33 @@ export default function PodViewer({ onReady, onPick, onHover, apiRef, startExplo
       else { controls.target.set(0, hgt * 0.3, 0); camera.position.set(4.5 * near, 4.2 * near, 10.5 * near); }
       controls.update();
       home = { p: camera.position.clone(), t: controls.target.clone() };
-      redraw(true);
-      onReady?.(parts.map((p) => p.label));
-      // Hero: open the pod up in front of the visitor.
-      if (startExploded) setTimeout(() => { explodeTo = 1; }, 500);
+      warmUp().then(() => {
+        if (disposed) return;
+        redraw(true);
+        onReady?.(parts.map((p) => p.label));
+        // Hero: open the pod up in front of the visitor.
+        if (startExploded) setTimeout(() => { explodeTo = 1; }, 500);
+      });
     });
+
+    // Do the expensive first-frame work now, off the scroll path: compile every shader (in parallel
+    // where the browser supports it, including the hidden exploded harness), upload every texture,
+    // and draw one frame so the shadow map and glass buffers exist. Scrolling to a view that has
+    // never been on screen then costs no more than any other frame.
+    async function warmUp() {
+      const hidden = [wiresA, wiresE].filter((w) => w && !w.visible);
+      hidden.forEach((w) => { w.visible = true; });
+      try { await renderer.compileAsync(scene, camera); } catch (e) { /* falls back to compiling on first draw */ }
+      if (disposed) return;
+      hidden.forEach((w) => { w.visible = false; });
+      const seen = new Set();
+      scene.traverse((o) => {
+        if (!o.material) return;
+        for (const m of [].concat(o.material)) for (const k in m) { const t = m[k]; if (t?.isTexture && !seen.has(t)) { seen.add(t); renderer.initTexture(t); } }
+      });
+      renderer.shadowMap.needsUpdate = true;
+      renderer.render(scene, camera);
+    }
 
     const api = {
       setExplode: (v) => { explodeTo = v; },
